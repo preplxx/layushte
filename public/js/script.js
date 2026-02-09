@@ -461,10 +461,13 @@ window.addEventListener("load", () => {
   }, { once: true });
   let folderOpen = false;
 
-const folder = document.getElementById("folder"); 
+const folder = document.getElementById("folder");
+const folderTop = document.getElementById("folder-top");
 const folderContent = document.getElementById("folder-content");
 
-folder.addEventListener("click", () => {
+let folderOpen = false;
+
+folderTop.addEventListener("click", () => {
   folderOpen = !folderOpen;
 
   if (folderOpen) {
@@ -476,6 +479,5 @@ folder.addEventListener("click", () => {
   }
 });
 
-});
 
 
