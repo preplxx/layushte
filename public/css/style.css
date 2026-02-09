@@ -509,3 +509,7 @@ body{
   opacity: 1;
   transform: scale(1);
 }
+#folder-top {
+  cursor: pointer;
+}
+
