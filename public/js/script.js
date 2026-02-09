@@ -1,4 +1,4 @@
-// ===== TEXT =====
+// ====== TEXT ======
 const answers_no = {
   english: [
     "No","Are you sure?","Are you really sure??","Are you really realy sure???",
@@ -29,51 +29,72 @@ const success_text = {
   arabic: "YAYYYYY YO2BORNE HAL JAMEL ANA :3"
 };
 
-// ===== STATE =====
+// ====== STATE ======
 let language = "english";
 let i = 1;
 let clicks = 0;
-let yesScale = 1;
-let opened = false;
 
-// ===== ELEMENTS =====
+// smoother growth, capped so it never overlaps heading
+let yesScale = 1;
+
+// ====== ELEMENTS ======
+const fx = document.getElementById("fx");
 const folder = document.getElementById("folder");
+const paper = document.getElementById("paper");
 const hint = document.getElementById("hint");
-const no_button = document.getElementById("no-button");
-const yes_button = document.getElementById("yes-button");
+
 const banner = document.getElementById("banner");
 const questionHeading = document.getElementById("question-heading");
 const successMessage = document.getElementById("success-message");
-const buttonsWrap = document.getElementsByClassName("buttons")[0];
-const messageWrap = document.getElementsByClassName("message")[0];
+const messageWrap = document.getElementById("message");
 
-const fx = document.getElementById("fx");
+const yesBtn = document.getElementById("yes-button");
+const noBtn = document.getElementById("no-button");
 
-// ===== Folder open only when pressed =====
-folder.addEventListener("click", (e) => {
-  // don't open when clicking buttons/select
-  if (e.target.closest(".buttons") || e.target.closest(".language-selector")) return;
-  if (opened) return;
-  opened = true;
+const langPill = document.querySelector(".lang-pill");
+const langEn = document.getElementById("lang-en");
+const langAr = document.getElementById("lang-ar");
+
+const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+
+// ====== FOLDER OPEN ======
+function openFolder(){
   folder.classList.add("open");
   if (hint) hint.style.display = "none";
+}
+
+folder.addEventListener("click", (e) => {
+  // don't toggle when clicking buttons/lang
+  if (e.target.closest(".buttons") || e.target.closest(".lang")) return;
+  openFolder();
 });
 
-// ===== HELPERS =====
-function refreshBanner() {
+folder.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    openFolder();
+  }
+});
+
+// ====== BANNER REFRESH ======
+function refreshBanner(){
   const src = banner.src;
   banner.src = "";
   banner.src = src;
 }
 
-function applyYesScale() {
-  yes_button.style.transform = `scale(${yesScale})`;
+// ====== APPLY YES SCALE WITHOUT LAG ======
+function applyYesScale(){
+  // cap so it can't overlap your heading area
+  const capped = Math.min(yesScale, window.innerWidth < 520 ? 1.35 : 1.55);
+  yesBtn.style.setProperty("--yesScale", capped);
 }
 
-function resetTexts() {
+// ====== RESET TEXTS ======
+function resetTexts(){
   questionHeading.innerHTML = heading_text[language] || heading_text.english;
-  yes_button.innerHTML = answers_yes[language] || answers_yes.english;
-  no_button.innerHTML = answers_no[language]?.[0] || answers_no.english[0];
+  yesBtn.textContent = answers_yes[language] || answers_yes.english;
+  noBtn.textContent = answers_no[language]?.[0] || answers_no.english[0];
   successMessage.textContent = success_text[language] || success_text.english;
 
   i = 1;
@@ -81,120 +102,270 @@ function resetTexts() {
   yesScale = 1;
   applyYesScale();
 
-  document.body.classList.toggle("lang-ar", language === "arabic");
+  // reset message visibility
+  messageWrap.style.display = "none";
+  document.querySelector(".buttons").style.display = "flex";
 }
 
-// ===== Ambient hearts (cute) =====
-function spawnHeartFloat() {
-  const h = document.createElement("div");
-  h.className = "heart-float";
-  const left = Math.random() * 100;
-  const dur = 3.5 + Math.random() * 4.5;
-  const size = 12 + Math.random() * 18;
-  h.style.left = `${left}vw`;
-  h.style.width = `${size}px`;
-  h.style.height = `${size}px`;
-  h.style.animationDuration = `${dur}s`;
-  h.style.opacity = `${0.25 + Math.random() * 0.65}`;
-  fx.appendChild(h);
-  setTimeout(() => h.remove(), dur * 1000);
-}
-setInterval(spawnHeartFloat, 260);
+// ====== PRETTY LANGUAGE TOGGLE ======
+function setLanguage(next){
+  language = next;
 
-// ===== YES overload =====
-function sparkleBurst(count = 80) {
-  for (let k = 0; k < count; k++) {
-    const s = document.createElement("div");
-    s.className = "spark";
-    s.style.left = `${35 + Math.random() * 30}vw`;
-    s.style.bottom = `${10 + Math.random() * 25}vh`;
-    s.style.animationDuration = `${0.7 + Math.random() * 1.0}s`;
-    fx.appendChild(s);
-    setTimeout(() => s.remove(), 1800);
+  langEn.classList.toggle("is-active", language === "english");
+  langAr.classList.toggle("is-active", language === "arabic");
+
+  langEn.setAttribute("aria-selected", language === "english" ? "true" : "false");
+  langAr.setAttribute("aria-selected", language === "arabic" ? "true" : "false");
+
+  langPill.classList.toggle("is-ar", language === "arabic");
+
+  resetTexts();
+}
+
+langEn.addEventListener("click", (e) => { e.preventDefault(); setLanguage("english"); });
+langAr.addEventListener("click", (e) => { e.preventDefault(); setLanguage("arabic"); });
+
+// Keep compatibility with your older onchange handler (if any)
+window.changeLanguage = function(){};
+
+// ====== OPTIMIZED PARTICLES (POOLED) ======
+function makeEl(cls){
+  const el = document.createElement("div");
+  el.className = cls;
+  el.style.display = "none";
+  fx.appendChild(el);
+  return el;
+}
+function poolCreate(cls, count){
+  const a = [];
+  for (let k=0;k<count;k++) a.push(makeEl(cls));
+  return a;
+}
+
+// low count = less lag, still cute
+const heartsPool = poolCreate("p-heart", 40);
+const sparksPool = poolCreate("p-spark", 34);
+const bowsPool   = poolCreate("p-bow", 26);
+
+const active = [];
+
+function spawnFrom(pool, init){
+  for (const el of pool){
+    if (el.style.display === "none"){
+      el.style.display = "block";
+      active.push(init(el));
+      return;
+    }
+  }
+}
+function kill(p){
+  p.el.style.display = "none";
+  const idx = active.indexOf(p);
+  if (idx >= 0) active.splice(idx, 1);
+}
+
+function tick(){
+  const dt = 1/60;
+
+  for (let n=active.length-1; n>=0; n--){
+    const p = active[n];
+
+    p.life += dt;
+    if (p.life >= p.maxLife){
+      kill(p);
+      continue;
+    }
+
+    p.vy += (p.grav || 0) * dt;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.rot += p.vr * dt;
+
+    const t = p.life / p.maxLife;
+    const a = p.fade ? (1 - t) : 1;
+
+    p.el.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${p.rot}deg)`;
+    p.el.style.opacity = a.toFixed(3);
+  }
+
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+// ambient cute float (hearts + bows + sparkles)
+function ambient(){
+  if (reducedMotion) return;
+
+  const w = window.innerWidth;
+  const startX = Math.random() * w;
+
+  const pick = Math.random();
+  if (pick < 0.55){
+    spawnFrom(heartsPool, (el) => {
+      const size = 10 + Math.random()*10;
+      el.style.width = `${size}px`;
+      el.style.height = `${size}px`;
+      el.style.background = `rgba(255,47,151,${0.22 + Math.random()*0.22})`;
+      return {
+        el,
+        x: startX,
+        y: window.innerHeight + 18,
+        vx: -10 + Math.random()*20,
+        vy: -60 - Math.random()*70,
+        rot: Math.random()*360,
+        vr: -60 + Math.random()*120,
+        grav: -8,
+        life: 0,
+        maxLife: 6 + Math.random()*3,
+        fade: true
+      };
+    });
+  } else if (pick < 0.80){
+    spawnFrom(bowsPool, (el) => {
+      el.style.background = `rgba(255,47,151,${0.18 + Math.random()*0.18})`;
+      return {
+        el,
+        x: startX,
+        y: window.innerHeight + 18,
+        vx: -12 + Math.random()*24,
+        vy: -55 - Math.random()*55,
+        rot: -20 + Math.random()*40,
+        vr: -30 + Math.random()*60,
+        grav: -6,
+        life: 0,
+        maxLife: 5 + Math.random()*2.5,
+        fade: true
+      };
+    });
+  } else {
+    spawnFrom(sparksPool, (el) => {
+      return {
+        el,
+        x: startX,
+        y: window.innerHeight + 18,
+        vx: -8 + Math.random()*16,
+        vy: -70 - Math.random()*80,
+        rot: 0,
+        vr: 0,
+        grav: -10,
+        life: 0,
+        maxLife: 3.6 + Math.random()*2.0,
+        fade: true
+      };
+    });
   }
 }
 
-function heartExplosion(count = 110) {
-  for (let k = 0; k < count; k++) {
-    setTimeout(() => {
-      const h = document.createElement("div");
-      h.className = "heart-float";
-      h.style.left = `${25 + Math.random() * 50}vw`;
-      h.style.bottom = `-30px`;
-      h.style.width = `${16 + Math.random() * 22}px`;
-      h.style.height = h.style.width;
-      h.style.animationDuration = `${2.2 + Math.random() * 2.6}s`;
-      h.style.opacity = `${0.35 + Math.random() * 0.55}`;
-      fx.appendChild(h);
-      setTimeout(() => h.remove(), 5200);
-    }, k * 14);
-  }
+if (!reducedMotion){
+  // slower spawn = less lag
+  setInterval(ambient, 320);
 }
 
-function confettiCannon(count = 260) {
-  const colors = ["#ff2f97","#ff8bd4","#ffd1e8","#ffffff","#ff4b6b","#ffb3c8","#aee7ff"];
-  for (let i = 0; i < count; i++) {
-    const c = document.createElement("div");
-    c.className = "confetti";
-    const x = 10 + Math.random() * 80;
-    const dur = 1.6 + Math.random() * 1.6;
-    const w = 6 + Math.random() * 10;
-    const h = 10 + Math.random() * 14;
-
-    c.style.left = `${x}vw`;
-    c.style.top = `-20px`;
-    c.style.width = `${w}px`;
-    c.style.height = `${h}px`;
-    c.style.background = colors[Math.floor(Math.random() * colors.length)];
-    c.style.animationDuration = `${dur}s`;
-    c.style.transform = `rotate(${Math.random() * 360}deg)`;
-
-    fx.appendChild(c);
-    setTimeout(() => c.remove(), 2600);
-  }
-}
-
-function screenPulseAndShake() {
+// ====== YES BIG SHOW (longer but optimized) ======
+function pulse(){
   const p = document.createElement("div");
   p.className = "pulse";
   document.body.appendChild(p);
-  setTimeout(() => p.remove(), 1400);
-
-  document.body.classList.add("shake");
-  setTimeout(() => document.body.classList.remove("shake"), 650);
+  setTimeout(() => p.remove(), 1100);
 }
 
-// fireworks style bursts
-function fireworkBursts(times = 6) {
-  let t = 0;
-  const interval = setInterval(() => {
-    sparkleBurst(60);
-    t++;
-    if (t >= times) clearInterval(interval);
-  }, 220);
+function burstWave(){
+  if (reducedMotion) return;
+
+  // modest wave count (smooth)
+  for (let k=0;k<14;k++){
+    spawnFrom(heartsPool, (el) => {
+      const size = 12 + Math.random()*14;
+      el.style.width = `${size}px`;
+      el.style.height = `${size}px`;
+      el.style.background = `rgba(255,47,151,${0.35 + Math.random()*0.35})`;
+
+      const x = window.innerWidth*0.5 + (-140 + Math.random()*280);
+      const y = window.innerHeight*0.55 + (-60 + Math.random()*120);
+
+      return {
+        el,
+        x,y,
+        vx: -120 + Math.random()*240,
+        vy: -240 - Math.random()*220,
+        rot: Math.random()*360,
+        vr: -120 + Math.random()*240,
+        grav: 520,
+        life: 0,
+        maxLife: 1.8 + Math.random()*0.9,
+        fade: true
+      };
+    });
+  }
+
+  for (let k=0;k<10;k++){
+    spawnFrom(sparksPool, (el) => {
+      const x = window.innerWidth*0.5 + (-180 + Math.random()*360);
+      const y = window.innerHeight*0.55 + (-60 + Math.random()*120);
+      return {
+        el,
+        x,y,
+        vx: -160 + Math.random()*320,
+        vy: -220 - Math.random()*220,
+        rot: 0,
+        vr: 0,
+        grav: 680,
+        life: 0,
+        maxLife: 1.1 + Math.random()*0.7,
+        fade: true
+      };
+    });
+  }
+
+  for (let k=0;k<8;k++){
+    spawnFrom(bowsPool, (el) => {
+      el.style.background = `rgba(255,47,151,${0.22 + Math.random()*0.20})`;
+      const x = window.innerWidth*0.5 + (-160 + Math.random()*320);
+      const y = window.innerHeight*0.55 + (-60 + Math.random()*120);
+      return {
+        el,
+        x,y,
+        vx: -110 + Math.random()*220,
+        vy: -200 - Math.random()*180,
+        rot: -20 + Math.random()*40,
+        vr: -80 + Math.random()*160,
+        grav: 520,
+        life: 0,
+        maxLife: 2.0 + Math.random()*0.8,
+        fade: true
+      };
+    });
+  }
 }
 
-// ===== EVENTS =====
-no_button.addEventListener("click", () => {
+function yesShow(){
+  pulse();
+  burstWave();
+
+  if (reducedMotion) return;
+
+  // longer “overload” without lag
+  const times = [180, 420, 700, 1050, 1450, 1900, 2400, 3000];
+  times.forEach(t => setTimeout(burstWave, t));
+}
+
+// ====== BUTTON LOGIC ======
+noBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+
   banner.src = "./public/images/yaalimadad.gif";
   refreshBanner();
 
   clicks++;
 
-  // grow YES button
-  const bumps = [0.14,0.12,0.10,0.16,0.18,0.11,0.15];
-  yesScale = Math.min(4.2, yesScale + bumps[Math.floor(Math.random() * bumps.length)]);
+  // smooth scale up (no weird animation)
+  const bump = 0.06 + Math.random()*0.05;
+  yesScale = Math.min(yesScale + bump, 1.8);
   applyYesScale();
 
-  // jelly pulse
-  yes_button.classList.remove("jelly");
-  void yes_button.offsetWidth;
-  yes_button.classList.add("jelly");
-
   const total = answers_no[language].length;
-
   if (i < total - 1) {
-    no_button.innerHTML = answers_no[language][i];
+    noBtn.textContent = answers_no[language][i];
     i++;
   } else {
     alert(answers_no[language][i]);
@@ -202,43 +373,21 @@ no_button.addEventListener("click", () => {
   }
 });
 
-yes_button.addEventListener("click", () => {
+yesBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+
   banner.src = "./public/images/yes.gif";
   refreshBanner();
 
-  // OVERLOAD
-  screenPulseAndShake();
-  confettiCannon(320);
-  sparkleBurst(120);
-  fireworkBursts(7);
-  heartExplosion(140);
+  yesShow();
 
-  // also rain hearts fast for 2 seconds
-  const rain = setInterval(() => spawnHeartFloat(), 60);
-  setTimeout(() => clearInterval(rain), 2000);
-
-  buttonsWrap.style.display = "none";
+  document.querySelector(".buttons").style.display = "none";
   messageWrap.style.display = "block";
   messageWrap.classList.remove("pop");
   void messageWrap.offsetWidth;
   messageWrap.classList.add("pop");
 });
 
-function changeLanguage() {
-  const select = document.getElementById("language-select");
-  language = (select.value === "arabic") ? "arabic" : "english";
-
-  const wasSuccess = (messageWrap.style.display === "block");
-  resetTexts();
-
-  if (wasSuccess) {
-    buttonsWrap.style.display = "none";
-    messageWrap.style.display = "block";
-  } else {
-    buttonsWrap.style.display = "flex";
-    messageWrap.style.display = "none";
-  }
-}
-
 // init
-resetTexts();
+setLanguage("english");
+applyYesScale();
