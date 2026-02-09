@@ -134,8 +134,8 @@ function changeLanguage() {
   i = 1;
   clicks = 0;
   size = 50;
-  yes_button.style.height = "60px";
-  yes_button.style.width = "60px";
+  yes_button.style.height = "70px";
+  yes_button.style.width = "70px";
 }
 yes_button.innerHTML = answers_yes[language];
 no_button.innerHTML = answers_no[language][0];
