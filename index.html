@@ -3,27 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Import Question</title>
+    <title>layushte</title>
     <link rel="stylesheet" href="./public/css/style.css" />
   </head>
 
   <body>
-    <!-- FX layer (particles live here) -->
+    <!-- FX layer -->
     <div id="fx"></div>
 
-    <div class="wrap">
-      <div class="folder" id="folder" aria-label="Open folder">
-        <div class="folder-lid">
-          <div class="folder-tab">
-            <span class="folder-label">la layushte super urgent!</span>
+    <main class="stage">
+      <!-- Folder -->
+      <section class="folder" id="folder" role="button" tabindex="0" aria-label="Open message folder">
+        <!-- Top bar ALWAYS visible -->
+        <div class="folder-top">
+          <div class="folder-badge">
+            <span class="badge-dot"></span>
+            <span class="badge-text">la layushte super urgent!</span>
           </div>
-          <div class="heart-stamp" aria-hidden="true">
-            <span class="heart"></span>
+
+          <div class="folder-stamp" aria-hidden="true">
+            <div class="stamp-heart"></div>
           </div>
         </div>
 
+        <!-- Lid -->
+        <div class="folder-lid" aria-hidden="true">
+          <div class="lid-shine"></div>
+        </div>
+
+        <!-- Pocket -->
         <div class="folder-pocket">
-          <div class="card" id="card">
+          <div class="paper" id="paper">
             <div class="banner">
               <img id="banner" src="./public/images/leaaa.gif" alt="banner" />
             </div>
@@ -33,27 +43,29 @@
             </h1>
 
             <div class="buttons">
-              <button id="yes-button">yes king</button>
-              <button id="no-button">No</button>
+              <button id="yes-button" type="button">yes king</button>
+              <button id="no-button" type="button">No</button>
             </div>
 
-            <div class="message">
+            <div class="message" id="message">
               <h2 id="success-message">YAYYYYY ur such a cutie mo- ahem layush! :3</h2>
             </div>
 
-            <div class="language-selector">
-              <label for="language-select">Choose Language:</label>
-              <select id="language-select" onchange="changeLanguage()">
-                <option value="english">English</option>
-                <option value="arabic">Soore</option>
-              </select>
+            <!-- Pretty language pill toggle -->
+            <div class="lang">
+              <span class="lang-label">Language</span>
+              <div class="lang-pill" role="tablist" aria-label="Language selector">
+                <button class="lang-btn is-active" id="lang-en" type="button" aria-selected="true">English</button>
+                <button class="lang-btn" id="lang-ar" type="button" aria-selected="false">Soore</button>
+                <span class="lang-slider" aria-hidden="true"></span>
+              </div>
             </div>
 
-            <div class="hint" id="hint">Click the folder to open 💌</div>
+            <div class="hint" id="hint">Tap the folder to open 💌</div>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
 
     <script src="./public/js/script.js"></script>
   </body>
