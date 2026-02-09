@@ -8,42 +8,48 @@
   </head>
 
   <body>
-    <!-- background blobs (css uses this) -->
-    <div class="bg-blobs"></div>
+    <!-- FX layer (particles live here) -->
+    <div id="fx"></div>
 
-    <div class="container">
-      <!-- shine overlay (css uses this) -->
-      <div class="shine"></div>
-
-      <!-- Folder wrapper -->
-      <div class="folder" id="folder">
-        <div class="folder-top">
-          <div class="folder-tab"></div>
-          <div class="folder-label">la layushte super urgent!</div>
+    <div class="wrap">
+      <div class="folder" id="folder" aria-label="Open folder">
+        <div class="folder-lid">
+          <div class="folder-tab">
+            <span class="folder-label">la layushte super urgent!</span>
+          </div>
+          <div class="heart-stamp" aria-hidden="true">
+            <span class="heart"></span>
+          </div>
         </div>
 
-        <div class="folder-body">
-          <div class="banner-gif">
-            <img id="banner" src="./public/images/leaaa.gif" alt="banner" />
-          </div>
+        <div class="folder-pocket">
+          <div class="card" id="card">
+            <div class="banner">
+              <img id="banner" src="./public/images/leaaa.gif" alt="banner" />
+            </div>
 
-          <h1 id="question-heading">Will you be my <span class="grad">valentine</span>?</h1>
+            <h1 id="question-heading">
+              Will you be my <span class="grad">valentine</span>?
+            </h1>
 
-          <div class="buttons">
-            <button id="yes-button">yes king</button>
-            <button id="no-button">No</button>
-          </div>
+            <div class="buttons">
+              <button id="yes-button">yes king</button>
+              <button id="no-button">No</button>
+            </div>
 
-          <div class="message">
-            <h2 id="success-message">YAYYYYY ur such a cutie mo- ahem layush! :3</h2>
-          </div>
+            <div class="message">
+              <h2 id="success-message">YAYYYYY ur such a cutie mo- ahem layush! :3</h2>
+            </div>
 
-          <div class="language-selector">
-            <label for="language-select">Choose Language:</label>
-            <select id="language-select" onchange="changeLanguage()">
-              <option value="english">English</option>
-              <option value="arabic">Soore</option>
-            </select>
+            <div class="language-selector">
+              <label for="language-select">Choose Language:</label>
+              <select id="language-select" onchange="changeLanguage()">
+                <option value="english">English</option>
+                <option value="arabic">Soore</option>
+              </select>
+            </div>
+
+            <div class="hint" id="hint">Click the folder to open 💌</div>
           </div>
         </div>
       </div>
