@@ -460,14 +460,14 @@ window.addEventListener("load", () => {
     bgm.play().catch(() => {});
   }, { once: true });
   let folderOpen = false;
-
 const folder = document.getElementById("folder");
 const folderTop = document.getElementById("folder-top");
 const folderContent = document.getElementById("folder-content");
 
 let folderOpen = false;
 
-folderTop.addEventListener("click", () => {
+// Open / Close function
+function toggleFolder() {
   folderOpen = !folderOpen;
 
   if (folderOpen) {
@@ -477,7 +477,26 @@ folderTop.addEventListener("click", () => {
     folder.classList.remove("open");
     folderContent.classList.remove("show");
   }
+}
+
+// ONLY folder-top controls open/close
+folderTop.addEventListener("click", (e) => {
+  e.stopPropagation();
+  toggleFolder();
 });
+
+// Prevent clicks inside folder content from closing it
+folderContent.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
+
+// Prevent clicks on buttons from affecting folder
+document.querySelectorAll("button, select, input, .lang, .sound-row").forEach(el => {
+  el.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+});
+
 
 
 
