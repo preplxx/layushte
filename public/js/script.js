@@ -459,46 +459,16 @@ window.addEventListener("load", () => {
   document.addEventListener("click", () => {
     bgm.play().catch(() => {});
   }, { once: true });
-// ===== PERMANENT FOLDER TOGGLE FIX =====
+const closeBtn = document.getElementById("close-folder");
 
-// 1) Grab elements
-let folder = document.getElementById("folder");
-const folderTop = document.getElementById("folder-top");
-const folderContent = document.getElementById("folder-content");
-
-// 2) HARD RESET: remove any old event listeners on #folder
-const freshFolder = folder.cloneNode(true);
-folder.parentNode.replaceChild(freshFolder, folder);
-folder = freshFolder;
-
-// 3) Keep state on the element itself (no "sometimes" bugs)
-folder.dataset.open = folder.classList.contains("open") ? "1" : "0";
-
-function setFolder(open) {
-  folder.dataset.open = open ? "1" : "0";
-  folder.classList.toggle("open", open);
-  folderContent.classList.toggle("show", open);
-}
-
-// 4) ONLY the top bar toggles
-folderTop.addEventListener("click", (e) => {
+closeBtn.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
-  const isOpen = folder.dataset.open === "1";
-  setFolder(!isOpen);
+  folder.classList.remove("open");
+  if (hint) hint.style.display = "block";
+  playSfx(aOpen); // optional whoosh on close
 });
 
-// 5) Block clicks inside content from ever toggling
-folderContent.addEventListener("click", (e) => {
-  e.stopPropagation();
-});
-
-// 6) Extra safety: block interactions from toggling
-["button", "select", "input", "a", ".buttons", ".lang", ".sound-row"].forEach(sel => {
-  document.querySelectorAll(sel).forEach(el => {
-    el.addEventListener("click", (e) => e.stopPropagation());
-  });
-});
 
 
 
