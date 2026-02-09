@@ -452,7 +452,7 @@ body.lang-ar #yes-button{
   100%{ opacity:0; transform: scale(1.05); }
 }
 
-/* Shake */
+
 .shake{
   animation: shake .65s ease;
 }
@@ -465,7 +465,7 @@ body.lang-ar #yes-button{
   100%{ transform: translate(0,0); }
 }
 
-/* Mobile */
+
 @media (max-width: 520px){
   .banner img{ height: 230px; }
   #yes-button,#no-button{ width:100%; max-width: 360px; }
