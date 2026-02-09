@@ -496,20 +496,24 @@ body{
     width:100%;
     min-width: unset;
   }
-}
-#folder-content {
-  display: none;
-  opacity: 0;
-  transform: scale(0.95);
-  transition: 0.4s ease;
-}
-
-#folder-content.show {
-  display: block;
-  opacity: 1;
-  transform: scale(1);
-}
-#folder-top {
+.close-btn{
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.6);
+  background: rgba(255,255,255,.75);
   cursor: pointer;
+  font-weight: 900;
+  font-size: 16px;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+  transition: transform .2s ease;
+  z-index: 20;
 }
+.close-btn:hover{ transform: translateY(-2px) scale(1.03); }
+.close-btn:active{ transform: translateY(0) scale(.98); }
 
+/* make sure paper can position absolute children */
+.paper{ position: relative; }
