@@ -42,7 +42,7 @@ body{
     linear-gradient(135deg, var(--bg1), var(--bg2));
 }
 
-/* Effects layer ON TOP */
+/* FX layer on top */
 #fx{
   position:fixed;
   inset:0;
@@ -66,7 +66,7 @@ body{
   filter: drop-shadow(0 28px 80px rgba(30,20,40,0.18));
 }
 
-/* TOP BAR (always visible) */
+/* Always-visible top bar */
 .folder-top{
   position:absolute;
   left: 18px;
@@ -145,17 +145,17 @@ body{
 .stamp-heart::before{ left:-20px; top:0; }
 .stamp-heart::after{ top:-20px; left:0; }
 
-/* FOLDER POCKET (NO LID BAR) */
+/* Folder pocket (NO lid strip) */
 .folder-pocket{
   position:relative;
-  padding: 112px 18px 18px; /* room for top bar only */
+  padding: 112px 18px 18px;
   border-radius: 44px;
   background: linear-gradient(135deg, var(--folderA), var(--folderB));
   border: 2px solid rgba(255,255,255,.30);
   box-shadow: inset 0 -18px 0 rgba(0,0,0,.06), var(--shadow);
 }
 
-/* inner paper */
+/* Paper (hidden until open) */
 .paper{
   width:min(820px, 100%);
   margin: 0 auto;
@@ -166,7 +166,6 @@ body{
   box-shadow: var(--shadowSoft);
   text-align:center;
 
-  /* closed state */
   transform-origin: top center;
   transform: translateY(-10px) scale(.98);
   opacity: 0;
@@ -179,14 +178,12 @@ body{
     max-height .55s ease;
 }
 
-/* open state */
 .folder.open .paper{
   transform: translateY(0) scale(1);
   opacity: 1;
-  max-height: 2200px;
+  max-height: 2400px;
 }
 
-/* subtle idle wiggle when closed */
 .folder:not(.open) .folder-top{
   animation: nudge 2.6s ease-in-out infinite;
 }
@@ -230,7 +227,7 @@ body{
   color: transparent;
 }
 
-/* buttons (never overlap heading) */
+/* buttons */
 .buttons{
   display:flex;
   justify-content:center;
@@ -305,13 +302,30 @@ body{
   font-weight: 900;
   font-size: clamp(18px, 2.1vw, 30px);
 }
+
+.restart{
+  margin-top: 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 900;
+  font-family: inherit;
+  background: rgba(255,255,255,.72);
+  border: 1px solid rgba(255, 208, 226, 0.85);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.10);
+  transition: transform .2s ease;
+}
+.restart:hover{ transform: translateY(-2px); }
+.restart:active{ transform: translateY(0); }
+
 .pop{ animation: popMsg .45s ease-out; }
 @keyframes popMsg{
   from{ transform: translateY(10px) scale(.98); opacity:0; }
   to{ transform: translateY(0) scale(1); opacity:1; }
 }
 
-/* language pill toggle */
+/* language pill */
 .lang{
   margin-top: 18px;
   display:flex;
@@ -369,6 +383,30 @@ body{
   transform: translateX(100%);
 }
 
+/* sound controls */
+.sound-row{
+  margin-top: 12px;
+  display:flex;
+  justify-content:center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sound-btn{
+  border:none;
+  cursor:pointer;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 900;
+  font-family: inherit;
+  background: rgba(255,255,255,.70);
+  border: 1px solid rgba(255, 208, 226, 0.85);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.10);
+  transition: transform .2s ease;
+}
+.sound-btn:hover{ transform: translateY(-2px); }
+.sound-btn:active{ transform: translateY(0); }
+
 /* particles */
 .p-heart,.p-spark,.p-bow{
   position:absolute;
@@ -421,19 +459,21 @@ body{
 .p-bow::before{ left:-8px; transform: rotate(-18deg); }
 .p-bow::after{ right:-8px; transform: rotate(18deg); }
 
-/* big yes pulse */
+/* big pulse overlay */
 .pulse{
   position:fixed;
   inset:0;
   z-index: 9999;
   pointer-events:none;
-  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.82), rgba(255,47,151,.18), transparent 65%);
-  animation: pulse 1s ease-out forwards;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255,255,255,.82), rgba(255,47,151,.22), transparent 65%),
+    radial-gradient(circle at 30% 70%, rgba(255,139,212,.16), transparent 55%);
+  animation: pulse 1.15s ease-out forwards;
 }
 @keyframes pulse{
   0%{ opacity:0; transform: scale(1); }
-  18%{ opacity:1; }
-  100%{ opacity:0; transform: scale(1.04); }
+  16%{ opacity:1; }
+  100%{ opacity:0; transform: scale(1.05); }
 }
 
 /* mobile */
