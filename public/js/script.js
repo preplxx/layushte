@@ -25,8 +25,8 @@ const heading_text = {
 };
 
 const success_text = {
-  english: "YAYYYYY ur such a cutie mo- ahem layush!",
-  arabic: "YAYYYYY YO2BORNE HAL JAMEL ANA"
+  english: "YAYYYYY ur such a cutie mo- ahem layush! :3",
+  arabic: "YAYYYYY YO2BORNE HAL JAMEL ANA :3"
 };
 
 // ===== STATE =====
@@ -34,8 +34,11 @@ let language = "english";
 let i = 1;
 let clicks = 0;
 let yesScale = 1;
+let opened = false;
 
 // ===== ELEMENTS =====
+const folder = document.getElementById("folder");
+const hint = document.getElementById("hint");
 const no_button = document.getElementById("no-button");
 const yes_button = document.getElementById("yes-button");
 const banner = document.getElementById("banner");
@@ -43,25 +46,18 @@ const questionHeading = document.getElementById("question-heading");
 const successMessage = document.getElementById("success-message");
 const buttonsWrap = document.getElementsByClassName("buttons")[0];
 const messageWrap = document.getElementsByClassName("message")[0];
-const folder = document.getElementById("folder");
 
-// ===== FX LAYER =====
-let fx = document.getElementById("fx-layer");
-if (!fx) {
-  fx = document.createElement("div");
-  fx.id = "fx-layer";
-  document.body.appendChild(fx);
-}
+const fx = document.getElementById("fx");
 
-// ===== FOLDER OPEN =====
+// ===== Folder open only when pressed =====
 folder.addEventListener("click", (e) => {
-  // don't re-close if clicking inside buttons etc
+  // don't open when clicking buttons/select
   if (e.target.closest(".buttons") || e.target.closest(".language-selector")) return;
+  if (opened) return;
+  opened = true;
   folder.classList.add("open");
+  if (hint) hint.style.display = "none";
 });
-
-// auto open after a short cute delay
-setTimeout(() => folder.classList.add("open"), 450);
 
 // ===== HELPERS =====
 function refreshBanner() {
@@ -88,109 +84,94 @@ function resetTexts() {
   document.body.classList.toggle("lang-ar", language === "arabic");
 }
 
-// ===== PARTICLES =====
-function spawnHeart({left, dur, size} = {}) {
+// ===== Ambient hearts (cute) =====
+function spawnHeartFloat() {
   const h = document.createElement("div");
-  h.className = "heart";
-  h.style.left = `${left ?? (Math.random() * 100)}vw`;
-  const D = dur ?? (3.5 + Math.random() * 4.5);
-  const S = size ?? (12 + Math.random() * 18);
-  h.style.width = `${S}px`;
-  h.style.height = `${S}px`;
-  h.style.animationDuration = `${D}s`;
+  h.className = "heart-float";
+  const left = Math.random() * 100;
+  const dur = 3.5 + Math.random() * 4.5;
+  const size = 12 + Math.random() * 18;
+  h.style.left = `${left}vw`;
+  h.style.width = `${size}px`;
+  h.style.height = `${size}px`;
+  h.style.animationDuration = `${dur}s`;
   h.style.opacity = `${0.25 + Math.random() * 0.65}`;
   fx.appendChild(h);
-  setTimeout(() => h.remove(), D * 1000);
+  setTimeout(() => h.remove(), dur * 1000);
 }
+setInterval(spawnHeartFloat, 260);
 
-function sparkleBurst(count = 40) {
+// ===== YES overload =====
+function sparkleBurst(count = 80) {
   for (let k = 0; k < count; k++) {
     const s = document.createElement("div");
     s.className = "spark";
     s.style.left = `${35 + Math.random() * 30}vw`;
-    s.style.bottom = `${12 + Math.random() * 22}vh`;
+    s.style.bottom = `${10 + Math.random() * 25}vh`;
     s.style.animationDuration = `${0.7 + Math.random() * 1.0}s`;
     fx.appendChild(s);
-    setTimeout(() => s.remove(), 1700);
+    setTimeout(() => s.remove(), 1800);
   }
 }
 
-function heartBurst(count = 60) {
+function heartExplosion(count = 110) {
   for (let k = 0; k < count; k++) {
-    setTimeout(() => spawnHeart({ left: 25 + Math.random()*50, dur: 2.2 + Math.random()*2.6 }), k * 18);
+    setTimeout(() => {
+      const h = document.createElement("div");
+      h.className = "heart-float";
+      h.style.left = `${25 + Math.random() * 50}vw`;
+      h.style.bottom = `-30px`;
+      h.style.width = `${16 + Math.random() * 22}px`;
+      h.style.height = h.style.width;
+      h.style.animationDuration = `${2.2 + Math.random() * 2.6}s`;
+      h.style.opacity = `${0.35 + Math.random() * 0.55}`;
+      fx.appendChild(h);
+      setTimeout(() => h.remove(), 5200);
+    }, k * 14);
   }
 }
 
-/* confetti */
-function confettiOverload(count = 220) {
+function confettiCannon(count = 260) {
+  const colors = ["#ff2f97","#ff8bd4","#ffd1e8","#ffffff","#ff4b6b","#ffb3c8","#aee7ff"];
   for (let i = 0; i < count; i++) {
     const c = document.createElement("div");
-    c.className = "spark";
-    c.style.width = `${4 + Math.random() * 10}px`;
-    c.style.height = `${4 + Math.random() * 10}px`;
-    c.style.borderRadius = `${Math.random() > 0.5 ? 999 : 2}px`;
-    c.style.left = `${Math.random() * 100}vw`;
-    c.style.bottom = `${70 + Math.random() * 10}vh`;
-    c.style.animationDuration = `${0.9 + Math.random() * 1.6}s`;
+    c.className = "confetti";
+    const x = 10 + Math.random() * 80;
+    const dur = 1.6 + Math.random() * 1.6;
+    const w = 6 + Math.random() * 10;
+    const h = 10 + Math.random() * 14;
+
+    c.style.left = `${x}vw`;
+    c.style.top = `-20px`;
+    c.style.width = `${w}px`;
+    c.style.height = `${h}px`;
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDuration = `${dur}s`;
+    c.style.transform = `rotate(${Math.random() * 360}deg)`;
+
     fx.appendChild(c);
-    setTimeout(() => c.remove(), 2400);
+    setTimeout(() => c.remove(), 2600);
   }
 }
 
-// ambient hearts
-setInterval(() => spawnHeart(), 260);
+function screenPulseAndShake() {
+  const p = document.createElement("div");
+  p.className = "pulse";
+  document.body.appendChild(p);
+  setTimeout(() => p.remove(), 1400);
 
-// ===== FIXED MOUSE TRAIL (smooth) =====
-let mx = 0, my = 0, last = 0;
-window.addEventListener("mousemove", (e) => { mx = e.clientX; my = e.clientY; });
-
-function trailTick(t) {
-  if (t - last > 18) { // ~55fps
-    last = t;
-    const dot = document.createElement("div");
-    dot.className = "trail";
-    dot.style.left = `${mx - 5}px`;
-    dot.style.top  = `${my - 5}px`;
-    document.body.appendChild(dot);
-    setTimeout(() => dot.remove(), 700);
-  }
-  requestAnimationFrame(trailTick);
+  document.body.classList.add("shake");
+  setTimeout(() => document.body.classList.remove("shake"), 650);
 }
-requestAnimationFrame(trailTick);
 
-// ===== SCREEN FLASH + SHAKE =====
-function screenFlash() {
-  const f = document.createElement("div");
-  f.style.position = "fixed";
-  f.style.inset = "0";
-  f.style.zIndex = "9999";
-  f.style.pointerEvents = "none";
-  f.style.background = "radial-gradient(circle at 50% 40%, rgba(255,255,255,.85), rgba(255,47,151,.15), transparent 65%)";
-  f.style.animation = "flash 1.1s ease-out forwards";
-  document.body.appendChild(f);
-
-  const style = document.createElement("style");
-  style.textContent = `
-    @keyframes flash{
-      0%{ opacity:0; transform: scale(1); }
-      15%{ opacity:1; }
-      100%{ opacity:0; transform: scale(1.05); }
-    }
-    @keyframes shake{
-      0%{ transform: translate(0,0); }
-      20%{ transform: translate(-6px, 4px); }
-      40%{ transform: translate(7px, -5px); }
-      60%{ transform: translate(-6px, -4px); }
-      80%{ transform: translate(6px, 4px); }
-      100%{ transform: translate(0,0); }
-    }
-  `;
-  document.head.appendChild(style);
-
-  document.body.style.animation = "shake .7s ease";
-  setTimeout(() => { document.body.style.animation = ""; }, 700);
-
-  setTimeout(() => { f.remove(); style.remove(); }, 1200);
+// fireworks style bursts
+function fireworkBursts(times = 6) {
+  let t = 0;
+  const interval = setInterval(() => {
+    sparkleBurst(60);
+    t++;
+    if (t >= times) clearInterval(interval);
+  }, 220);
 }
 
 // ===== EVENTS =====
@@ -200,11 +181,12 @@ no_button.addEventListener("click", () => {
 
   clicks++;
 
-  // grow YES (but keep it cute)
+  // grow YES button
   const bumps = [0.14,0.12,0.10,0.16,0.18,0.11,0.15];
-  yesScale = Math.min(4.0, yesScale + bumps[Math.floor(Math.random() * bumps.length)]);
+  yesScale = Math.min(4.2, yesScale + bumps[Math.floor(Math.random() * bumps.length)]);
   applyYesScale();
 
+  // jelly pulse
   yes_button.classList.remove("jelly");
   void yes_button.offsetWidth;
   yes_button.classList.add("jelly");
@@ -224,14 +206,15 @@ yes_button.addEventListener("click", () => {
   banner.src = "./public/images/yes.gif";
   refreshBanner();
 
-  // OVERLOAD EVERYTHING
-  screenFlash();
-  confettiOverload(260);
-  sparkleBurst(70);
-  heartBurst(80);
+  // OVERLOAD
+  screenPulseAndShake();
+  confettiCannon(320);
+  sparkleBurst(120);
+  fireworkBursts(7);
+  heartExplosion(140);
 
-  // extra: rain hearts for a bit
-  const rain = setInterval(() => spawnHeart({ size: 18 + Math.random()*18, dur: 2.4 + Math.random()*2.2 }), 80);
+  // also rain hearts fast for 2 seconds
+  const rain = setInterval(() => spawnHeartFloat(), 60);
   setTimeout(() => clearInterval(rain), 2000);
 
   buttonsWrap.style.display = "none";
@@ -242,8 +225,8 @@ yes_button.addEventListener("click", () => {
 });
 
 function changeLanguage() {
-  const selectElement = document.getElementById("language-select");
-  language = (selectElement.value === "arabic") ? "arabic" : "english";
+  const select = document.getElementById("language-select");
+  language = (select.value === "arabic") ? "arabic" : "english";
 
   const wasSuccess = (messageWrap.style.display === "block");
   resetTexts();
@@ -257,5 +240,5 @@ function changeLanguage() {
   }
 }
 
-// ===== INIT =====
+// init
 resetTexts();
