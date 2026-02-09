@@ -459,43 +459,47 @@ window.addEventListener("load", () => {
   document.addEventListener("click", () => {
     bgm.play().catch(() => {});
   }, { once: true });
-  let folderOpen = false;
-const folder = document.getElementById("folder");
+// ===== PERMANENT FOLDER TOGGLE FIX =====
+
+// 1) Grab elements
+let folder = document.getElementById("folder");
 const folderTop = document.getElementById("folder-top");
 const folderContent = document.getElementById("folder-content");
 
-let folderOpen = false;
+// 2) HARD RESET: remove any old event listeners on #folder
+const freshFolder = folder.cloneNode(true);
+folder.parentNode.replaceChild(freshFolder, folder);
+folder = freshFolder;
 
-// Open / Close function
-function toggleFolder() {
-  folderOpen = !folderOpen;
+// 3) Keep state on the element itself (no "sometimes" bugs)
+folder.dataset.open = folder.classList.contains("open") ? "1" : "0";
 
-  if (folderOpen) {
-    folder.classList.add("open");
-    folderContent.classList.add("show");
-  } else {
-    folder.classList.remove("open");
-    folderContent.classList.remove("show");
-  }
+function setFolder(open) {
+  folder.dataset.open = open ? "1" : "0";
+  folder.classList.toggle("open", open);
+  folderContent.classList.toggle("show", open);
 }
 
-// ONLY folder-top controls open/close
+// 4) ONLY the top bar toggles
 folderTop.addEventListener("click", (e) => {
+  e.preventDefault();
   e.stopPropagation();
-  toggleFolder();
+  const isOpen = folder.dataset.open === "1";
+  setFolder(!isOpen);
 });
 
-// Prevent clicks inside folder content from closing it
+// 5) Block clicks inside content from ever toggling
 folderContent.addEventListener("click", (e) => {
   e.stopPropagation();
 });
 
-// Prevent clicks on buttons from affecting folder
-document.querySelectorAll("button, select, input, .lang, .sound-row").forEach(el => {
-  el.addEventListener("click", (e) => {
-    e.stopPropagation();
+// 6) Extra safety: block interactions from toggling
+["button", "select", "input", "a", ".buttons", ".lang", ".sound-row"].forEach(sel => {
+  document.querySelectorAll(sel).forEach(el => {
+    el.addEventListener("click", (e) => e.stopPropagation());
   });
 });
+
 
 
 
