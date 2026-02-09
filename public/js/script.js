@@ -17,8 +17,6 @@ const answers_no = {
     "I am begging you to stop!",
     "Ok, Let's just start over.."
   ],
-
-  // Lebanese Arabizi
   arabic: [
     "La2!",
     "M2akde...?",
@@ -56,8 +54,8 @@ const success_text = {
 // ===== STATE =====
 let language = "english";
 let i = 1;
-let size = 50;
 let clicks = 0;
+let yesScale = 1; // we scale instead of changing width/height
 
 // ===== ELEMENTS =====
 const no_button = document.getElementById("no-button");
@@ -65,6 +63,8 @@ const yes_button = document.getElementById("yes-button");
 const banner = document.getElementById("banner");
 const questionHeading = document.getElementById("question-heading");
 const successMessage = document.getElementById("success-message");
+const buttonsWrap = document.getElementsByClassName("buttons")[0];
+const messageWrap = document.getElementsByClassName("message")[0];
 
 // ===== HEARTS LAYER =====
 function ensureHeartsLayer() {
@@ -76,33 +76,51 @@ function ensureHeartsLayer() {
 }
 ensureHeartsLayer();
 
-function spawnHeart() {
+function spawnHeart(opts = {}) {
   const layer = document.getElementById("hearts-layer");
   if (!layer) return;
 
   const heart = document.createElement("div");
   heart.className = "heart";
 
-  const left = Math.random() * 100;
-  const dur = 4 + Math.random() * 4;      // 4-8s
-  const s = 10 + Math.random() * 14;      // 10-24px
-  const alpha = 0.35 + Math.random() * 0.35;
+  const left = opts.left ?? (Math.random() * 100);
+  const dur = opts.dur ?? (4 + Math.random() * 5); // 4-9s
+  const s = opts.size ?? (10 + Math.random() * 16); // 10-26px
+  const alpha = 0.30 + Math.random() * 0.45;
 
   heart.style.left = `${left}vw`;
   heart.style.width = `${s}px`;
   heart.style.height = `${s}px`;
   heart.style.animationDuration = `${dur}s`;
-  heart.style.background = `rgba(255, 90, 165, ${alpha})`;
+  heart.style.opacity = `${alpha}`;
 
   layer.appendChild(heart);
   setTimeout(() => heart.remove(), dur * 1000);
 }
 
-// background hearts
-setInterval(spawnHeart, 550);
+// ambient hearts
+setInterval(() => spawnHeart(), 420);
 
 function burstHearts() {
-  for (let k = 0; k < 18; k++) setTimeout(spawnHeart, k * 60);
+  // quick burst near center
+  for (let k = 0; k < 26; k++) {
+    setTimeout(() => spawnHeart({ left: 35 + Math.random() * 30, dur: 3 + Math.random() * 3 }), k * 40);
+  }
+}
+
+// sparkles burst
+function sparkleBurst() {
+  const layer = document.getElementById("hearts-layer");
+  if (!layer) return;
+  for (let k = 0; k < 18; k++) {
+    const s = document.createElement("div");
+    s.className = "spark";
+    s.style.left = `${45 + Math.random() * 10}vw`;
+    s.style.bottom = `${18 + Math.random() * 12}vh`;
+    s.style.animationDuration = `${0.9 + Math.random() * 0.8}s`;
+    layer.appendChild(s);
+    setTimeout(() => s.remove(), 1800);
+  }
 }
 
 // ===== HELPERS =====
@@ -112,21 +130,16 @@ function refreshBanner() {
   banner.src = src;
 }
 
-function setYesBaseSize() {
-  // Arabic: a bit bigger
-  if (language === "arabic") {
-    size = 70;
-    yes_button.style.height = "70px";
-    yes_button.style.width = "120px";
-  } else {
-    size = 50;
-    yes_button.style.height = "50px";
-    yes_button.style.width = "50px";
-  }
+function applyYesScale() {
+  yes_button.style.transform = `scale(${yesScale})`;
+}
+
+function resetYesScale() {
+  yesScale = 1;
+  applyYesScale();
 }
 
 function resetTexts() {
-  // heading uses innerHTML to allow gradient span
   questionHeading.innerHTML = heading_text[language] || heading_text.english;
 
   yes_button.innerHTML = answers_yes[language] || answers_yes.english;
@@ -136,26 +149,30 @@ function resetTexts() {
 
   i = 1;
   clicks = 0;
-  setYesBaseSize();
+  resetYesScale();
+
+  // Arabic: slightly bigger base via CSS class
+  document.body.classList.toggle("lang-ar", language === "arabic");
 }
 
 // ===== EVENTS =====
 no_button.addEventListener("click", () => {
-  // NO gif always
+  // NO gif
   banner.src = "./public/images/yaalimadad.gif";
   refreshBanner();
 
   clicks++;
 
-  // grow YES button gradually
-  const sizes = [40, 50, 30, 35, 45];
-  size += sizes[Math.floor(Math.random() * sizes.length)];
-  yes_button.style.height = `${size}px`;
-  yes_button.style.width = `${size}px`;
+  // grow YES button using scale (doesn't break layout)
+  const bumps = [0.10, 0.12, 0.08, 0.14, 0.11];
+  yesScale = Math.min(3.2, yesScale + bumps[Math.floor(Math.random() * bumps.length)]);
+  applyYesScale();
+  yes_button.classList.remove("bounce");
+  void yes_button.offsetWidth; // reflow to replay animation
+  yes_button.classList.add("bounce");
 
   const total = answers_no[language].length;
 
-  // change NO text
   if (i < total - 1) {
     no_button.innerHTML = answers_no[language][i];
     i++;
@@ -166,34 +183,35 @@ no_button.addEventListener("click", () => {
 });
 
 yes_button.addEventListener("click", () => {
-  // YES gif always
+  // YES gif
   banner.src = "./public/images/yes.gif";
   refreshBanner();
 
   burstHearts();
+  sparkleBurst();
 
-  // hide buttons, show message
-  document.getElementsByClassName("buttons")[0].style.display = "none";
-  document.getElementsByClassName("message")[0].style.display = "block";
+  buttonsWrap.style.display = "none";
+  messageWrap.style.display = "block";
+  messageWrap.classList.remove("pop");
+  void messageWrap.offsetWidth;
+  messageWrap.classList.add("pop");
 });
 
 function changeLanguage() {
   const selectElement = document.getElementById("language-select");
   const val = selectElement.value;
 
-  // lock to keys we have
   language = (val === "arabic") ? "arabic" : "english";
 
-  // if success already shown, keep it shown
-  const buttons = document.getElementsByClassName("buttons")[0];
-  const message = document.getElementsByClassName("message")[0];
-  const wasSuccess = (message.style.display === "block");
-
+  const wasSuccess = (messageWrap.style.display === "block");
   resetTexts();
 
   if (wasSuccess) {
-    buttons.style.display = "none";
-    message.style.display = "block";
+    buttonsWrap.style.display = "none";
+    messageWrap.style.display = "block";
+  } else {
+    buttonsWrap.style.display = "flex";
+    messageWrap.style.display = "none";
   }
 }
 
