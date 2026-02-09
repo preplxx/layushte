@@ -12,7 +12,6 @@
     <div id="fx" aria-hidden="true"></div>
 
     <main class="stage">
-      <!-- Folder (click to open) -->
       <section
         class="folder"
         id="folder"
@@ -27,14 +26,13 @@
             <span class="badge-text">la layushte super urgent!</span>
           </div>
 
-          <div class="folder-stamp">
+          <div class="folder-stamp" aria-hidden="true">
             <div class="stamp-heart"></div>
           </div>
         </div>
 
-        <!-- Folder pocket -->
+        <!-- Folder pocket (no lid strip) -->
         <div class="folder-pocket">
-          <!-- Paper (hidden until open) -->
           <div class="paper" id="paper">
             <div class="banner">
               <img id="banner" src="./public/images/leaaa.gif" alt="banner" />
@@ -53,6 +51,9 @@
               <h2 id="success-message">
                 YAYYYYY ur such a cutie mo- ahem layush! :3
               </h2>
+              <button id="restart-btn" class="restart" type="button">
+                Restart 💞
+              </button>
             </div>
 
             <div class="lang">
@@ -66,7 +67,23 @@
               </div>
             </div>
 
+            <!-- Sound controls -->
+            <div class="sound-row">
+              <button id="music-toggle" class="sound-btn" type="button" aria-pressed="false">
+                🎵 Music: Off
+              </button>
+              <button id="sfx-toggle" class="sound-btn" type="button" aria-pressed="false">
+                🔇 SFX: Off
+              </button>
+            </div>
+
             <div class="hint" id="hint">Tap the folder to open 💌</div>
+
+            <!-- Audio (you add files in /public/sounds/) -->
+            <audio id="bgm" loop preload="auto"></audio>
+            <audio id="sfx-open" preload="auto"></audio>
+            <audio id="sfx-yes" preload="auto"></audio>
+            <audio id="sfx-no" preload="auto"></audio>
           </div>
         </div>
       </section>
