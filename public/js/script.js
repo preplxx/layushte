@@ -55,7 +55,7 @@ const success_text = {
 let language = "english";
 let i = 1;
 let clicks = 0;
-let yesScale = 1; // we scale instead of changing width/height
+let yesScale = 1;
 
 // ===== ELEMENTS =====
 const no_button = document.getElementById("no-button");
@@ -65,63 +65,31 @@ const questionHeading = document.getElementById("question-heading");
 const successMessage = document.getElementById("success-message");
 const buttonsWrap = document.getElementsByClassName("buttons")[0];
 const messageWrap = document.getElementsByClassName("message")[0];
+const container = document.getElementsByClassName("container")[0];
 
-// ===== HEARTS LAYER =====
-function ensureHeartsLayer() {
-  if (!document.getElementById("hearts-layer")) {
-    const layer = document.createElement("div");
-    layer.id = "hearts-layer";
-    document.body.appendChild(layer);
+// ===== Add background blobs + fx layer + shine (only once) =====
+(function setupDecor(){
+  if (!document.querySelector(".bg-blobs")){
+    const b = document.createElement("div");
+    b.className = "bg-blobs";
+    document.body.appendChild(b);
   }
-}
-ensureHeartsLayer();
 
-function spawnHeart(opts = {}) {
-  const layer = document.getElementById("hearts-layer");
-  if (!layer) return;
-
-  const heart = document.createElement("div");
-  heart.className = "heart";
-
-  const left = opts.left ?? (Math.random() * 100);
-  const dur = opts.dur ?? (4 + Math.random() * 5); // 4-9s
-  const s = opts.size ?? (10 + Math.random() * 16); // 10-26px
-  const alpha = 0.30 + Math.random() * 0.45;
-
-  heart.style.left = `${left}vw`;
-  heart.style.width = `${s}px`;
-  heart.style.height = `${s}px`;
-  heart.style.animationDuration = `${dur}s`;
-  heart.style.opacity = `${alpha}`;
-
-  layer.appendChild(heart);
-  setTimeout(() => heart.remove(), dur * 1000);
-}
-
-// ambient hearts
-setInterval(() => spawnHeart(), 420);
-
-function burstHearts() {
-  // quick burst near center
-  for (let k = 0; k < 26; k++) {
-    setTimeout(() => spawnHeart({ left: 35 + Math.random() * 30, dur: 3 + Math.random() * 3 }), k * 40);
+  if (!document.getElementById("fx-layer")){
+    const fx = document.createElement("div");
+    fx.id = "fx-layer";
+    document.body.appendChild(fx);
   }
-}
 
-// sparkles burst
-function sparkleBurst() {
-  const layer = document.getElementById("hearts-layer");
-  if (!layer) return;
-  for (let k = 0; k < 18; k++) {
+  if (!container.querySelector(".shine")){
     const s = document.createElement("div");
-    s.className = "spark";
-    s.style.left = `${45 + Math.random() * 10}vw`;
-    s.style.bottom = `${18 + Math.random() * 12}vh`;
-    s.style.animationDuration = `${0.9 + Math.random() * 0.8}s`;
-    layer.appendChild(s);
-    setTimeout(() => s.remove(), 1800);
+    s.className = "shine";
+    container.appendChild(s);
   }
-}
+})();
+
+const fxLayer = document.getElementById("fx-layer");
+const shine = container.querySelector(".shine");
 
 // ===== HELPERS =====
 function refreshBanner() {
@@ -134,42 +102,112 @@ function applyYesScale() {
   yes_button.style.transform = `scale(${yesScale})`;
 }
 
-function resetYesScale() {
-  yesScale = 1;
-  applyYesScale();
-}
-
-function resetTexts() {
+function resetAllTexts() {
   questionHeading.innerHTML = heading_text[language] || heading_text.english;
-
   yes_button.innerHTML = answers_yes[language] || answers_yes.english;
   no_button.innerHTML = answers_no[language]?.[0] || answers_no.english[0];
-
   successMessage.textContent = success_text[language] || success_text.english;
 
   i = 1;
   clicks = 0;
-  resetYesScale();
+  yesScale = 1;
+  applyYesScale();
 
-  // Arabic: slightly bigger base via CSS class
   document.body.classList.toggle("lang-ar", language === "arabic");
 }
 
+// ===== PARTICLES =====
+function spawnHeart({left, dur, size} = {}) {
+  const h = document.createElement("div");
+  h.className = "heart";
+
+  const L = left ?? (Math.random() * 100);
+  const D = dur ?? (4 + Math.random() * 5);
+  const S = size ?? (12 + Math.random() * 18);
+
+  h.style.left = `${L}vw`;
+  h.style.width = `${S}px`;
+  h.style.height = `${S}px`;
+  h.style.animationDuration = `${D}s`;
+  h.style.opacity = `${0.25 + Math.random() * 0.6}`;
+
+  fxLayer.appendChild(h);
+  setTimeout(() => h.remove(), D * 1000);
+}
+
+function burstHearts() {
+  for (let k = 0; k < 44; k++) {
+    setTimeout(() => spawnHeart({ left: 28 + Math.random()*44, dur: 2.2 + Math.random()*2.6 }), k * 28);
+  }
+}
+
+function sparkleBurst() {
+  for (let k = 0; k < 34; k++) {
+    const s = document.createElement("div");
+    s.className = "spark";
+    s.style.left = `${40 + Math.random()*20}vw`;
+    s.style.bottom = `${18 + Math.random()*16}vh`;
+    s.style.animationDuration = `${0.75 + Math.random()*0.95}s`;
+    fxLayer.appendChild(s);
+    setTimeout(() => s.remove(), 1700);
+  }
+}
+
+// ambient hearts (cuter)
+setInterval(() => spawnHeart(), 280);
+
+// mouse trail (cute)
+let lastTrail = 0;
+window.addEventListener("mousemove", (e) => {
+  const now = performance.now();
+  if (now - lastTrail < 18) return; // limit
+  lastTrail = now;
+
+  const t = document.createElement("div");
+  t.className = "trail";
+  t.style.left = `${e.clientX - 5}px`;
+  t.style.top  = `${e.clientY - 5}px`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 720);
+});
+
+// 3D tilt + shine follows mouse
+container.addEventListener("mousemove", (e) => {
+  const r = container.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width;
+  const y = (e.clientY - r.top) / r.height;
+
+  const rx = (0.5 - y) * 8;
+  const ry = (x - 0.5) * 10;
+
+  container.style.transform = `translateY(-6px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+  container.style.boxShadow = `0 34px 110px rgba(30,20,40,0.20)`;
+
+  // shine position
+  container.style.setProperty("--mx", `${x * 100}%`);
+  container.style.setProperty("--my", `${y * 100}%`);
+});
+container.addEventListener("mouseleave", () => {
+  container.style.transform = "";
+  container.style.boxShadow = "";
+});
+
 // ===== EVENTS =====
 no_button.addEventListener("click", () => {
-  // NO gif
   banner.src = "./public/images/yaalimadad.gif";
   refreshBanner();
 
   clicks++;
 
-  // grow YES button using scale (doesn't break layout)
-  const bumps = [0.10, 0.12, 0.08, 0.14, 0.11];
-  yesScale = Math.min(3.2, yesScale + bumps[Math.floor(Math.random() * bumps.length)]);
+  // grow YES button (still stays big base)
+  const bumps = [0.14, 0.12, 0.10, 0.16, 0.11, 0.18];
+  yesScale = Math.min(3.7, yesScale + bumps[Math.floor(Math.random() * bumps.length)]);
   applyYesScale();
-  yes_button.classList.remove("bounce");
-  void yes_button.offsetWidth; // reflow to replay animation
-  yes_button.classList.add("bounce");
+
+  // jelly animation
+  yes_button.classList.remove("jelly");
+  void yes_button.offsetWidth;
+  yes_button.classList.add("jelly");
 
   const total = answers_no[language].length;
 
@@ -178,12 +216,11 @@ no_button.addEventListener("click", () => {
     i++;
   } else {
     alert(answers_no[language][i]);
-    resetTexts();
+    resetAllTexts();
   }
 });
 
 yes_button.addEventListener("click", () => {
-  // YES gif
   banner.src = "./public/images/yes.gif";
   refreshBanner();
 
@@ -192,6 +229,7 @@ yes_button.addEventListener("click", () => {
 
   buttonsWrap.style.display = "none";
   messageWrap.style.display = "block";
+
   messageWrap.classList.remove("pop");
   void messageWrap.offsetWidth;
   messageWrap.classList.add("pop");
@@ -199,12 +237,10 @@ yes_button.addEventListener("click", () => {
 
 function changeLanguage() {
   const selectElement = document.getElementById("language-select");
-  const val = selectElement.value;
-
-  language = (val === "arabic") ? "arabic" : "english";
+  language = (selectElement.value === "arabic") ? "arabic" : "english";
 
   const wasSuccess = (messageWrap.style.display === "block");
-  resetTexts();
+  resetAllTexts();
 
   if (wasSuccess) {
     buttonsWrap.style.display = "none";
@@ -215,5 +251,5 @@ function changeLanguage() {
   }
 }
 
-// ===== INITIAL LOAD =====
-resetTexts();
+// ===== INIT =====
+resetAllTexts();
