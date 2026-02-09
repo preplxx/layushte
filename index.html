@@ -1,94 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Layushte</title>
-    <link rel="stylesheet" href="./public/css/style.css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Layushte 💌</title>
+  <link rel="stylesheet" href="./public/css/style.css" />
+</head>
 
-  <body>
-    <!-- Effects layer -->
-    <div id="fx" aria-hidden="true"></div>
+<body>
+  <!-- FX layer -->
+  <div id="fx" aria-hidden="true"></div>
 
-    <main class="stage">
-      <section
-        class="folder"
-        id="folder"
-        role="button"
-        tabindex="0"
-        aria-label="Open the urgent folder"
-      >
-        <!-- Always-visible top bar -->
-     <div class="folder-top" id="folder-top">
-          <div class="folder-badge">
-            <span class="badge-dot"></span>
-            <span class="badge-text">la layushte super urgent!</span>
-          </div>
-
-          <div class="folder-stamp" aria-hidden="true">
-            <div class="stamp-heart"></div>
-          </div>
+  <main class="stage">
+    <section class="folder" id="folder" tabindex="0" aria-label="Valentine folder">
+      <!-- TOP (ONLY this area opens) -->
+      <div class="folder-top" id="folder-top" role="button" aria-label="Open folder">
+        <div class="folder-badge">
+          <span class="badge-dot"></span>
+          <div class="badge-text">la layushte super urgent!</div>
         </div>
 
-        <!-- Folder pocket (no lid strip) -->
-        <div class="folder-pocket">
-          <div class="paper" id="paper">
-            <div class="banner">
-              <img id="banner" src="./public/images/leaaa.gif" alt="banner" />
+        <div class="folder-stamp" aria-hidden="true">
+          <div class="stamp-heart"></div>
+        </div>
+      </div>
+
+      <!-- FOLDER POCKET -->
+      <div class="folder-pocket">
+        <p class="hint" id="hint">tap the top to open 💗</p>
+
+        <!-- PAPER -->
+        <div class="paper" id="paper">
+          <button class="close-btn" id="close-folder" type="button" aria-label="Close">✖</button>
+
+          <div class="banner">
+            <img id="banner" src="./public/images/leaaa.gif" alt="banner" />
+          </div>
+
+          <h1 id="question-heading" class="question">
+            Will you be my <span class="grad">valentine</span>?
+          </h1>
+
+          <div class="buttons">
+            <button id="yes-button" type="button">yes king</button>
+            <button id="no-button" type="button">No</button>
+          </div>
+
+          <div class="message" id="message">
+            <h2 id="success-message">YAYYYYY ur such a cutie mo- ahem layush! :3</h2>
+            <button class="restart" id="restart-btn" type="button">Restart ♻️</button>
+          </div>
+
+          <div class="lang">
+            <span class="lang-label">Language</span>
+
+            <div class="lang-pill" id="lang-pill">
+              <div class="lang-slider"></div>
+              <button class="lang-btn is-active" id="lang-en" type="button">English</button>
+              <button class="lang-btn" id="lang-ar" type="button">Soore</button>
             </div>
+          </div>
 
-            <h1 id="question-heading">
-              Will you be my <span class="grad">valentine</span>?
-            </h1>
-
-            <div class="buttons">
-              <button id="yes-button" type="button">yes king</button>
-              <button id="no-button" type="button">No</button>
-            </div>
-
-            <div class="message" id="message">
-              <h2 id="success-message">
-                YAYYYYY ur such a cutie mo- ahem layush! :3
-              </h2>
-              <button id="restart-btn" class="restart" type="button">
-                Restart 💞
-              </button>
-            </div>
-
-            <div class="lang">
-              <span class="lang-label">Language</span>
-              <div class="lang-pill" id="lang-pill">
-                <button class="lang-btn is-active" id="lang-en" type="button">
-                  English
-                </button>
-                <button class="lang-btn" id="lang-ar" type="button">Soore</button>
-                <span class="lang-slider" aria-hidden="true"></span>
-              </div>
-            </div>
-
-            <!-- Sound controls -->
-            <div class="sound-row">
-              <button id="music-toggle" class="sound-btn" type="button" aria-pressed="false">
-                🎵 Music: Off
-              </button>
-              <button id="sfx-toggle" class="sound-btn" type="button" aria-pressed="false">
-                🔇 SFX: Off
-              </button>
-            </div>
-
-            <div class="hint" id="hint">Tap the folder to open 💌</div>
-
-            <!-- Audio (you add files in /public/sounds/) -->
-            <audio id="bgm" loop preload="auto"></audio>
-            <audio id="sfx-open" preload="auto"></audio>
-            <audio id="sfx-yes" preload="auto"></audio>
-            <audio id="sfx-no" preload="auto"></audio>
+          <div class="sound-row">
+            <button class="sound-btn" id="music-toggle" type="button" aria-pressed="false">🎵 Music: Off</button>
+            <button class="sound-btn" id="sfx-toggle" type="button" aria-pressed="false">🔇 SFX: Off</button>
           </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
+  </main>
 
-    <script src="./public/js/script.js"></script>
-  </body>
+  <!-- audio tags (preload) -->
+  <audio id="bgm" preload="auto" loop></audio>
+  <audio id="sfx-open" preload="auto"></audio>
+  <audio id="sfx-yes" preload="auto"></audio>
+  <audio id="sfx-no" preload="auto"></audio>
+
+  <script src="./public/js/script.js"></script>
+</body>
 </html>
