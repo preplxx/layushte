@@ -15,9 +15,6 @@
   --folderA:#ff2a6f;
   --folderB:#ff83b7;
 
-  --glass: rgba(255,255,255,.22);
-  --glass2: rgba(255,255,255,.32);
-
   --paperA: rgba(255,255,255,.92);
   --paperB: rgba(255,245,252,.72);
 
@@ -27,6 +24,7 @@
 
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
+
 body{
   margin:0;
   font-family:Poppins, Arial, sans-serif;
@@ -36,24 +34,21 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-
   padding: 22px 14px;
+
   background:
     radial-gradient(900px 600px at 18% 12%, rgba(255, 80, 160, 0.55) 0%, transparent 58%),
     radial-gradient(900px 600px at 82% 0%, rgba(130, 205, 255, 0.35) 0%, transparent 58%),
     linear-gradient(135deg, var(--bg1), var(--bg2));
 }
 
-@media (prefers-reduced-motion: reduce){
-  *{ animation:none !important; transition:none !important; }
-}
-
+/* Effects layer ON TOP */
 #fx{
   position:fixed;
   inset:0;
   pointer-events:none;
   overflow:hidden;
-  z-index: 999;
+  z-index: 99999;
 }
 
 .stage{
@@ -63,7 +58,6 @@ body{
   align-items:center;
 }
 
-/* ===== Folder frame ===== */
 .folder{
   width:min(920px, 100%);
   position:relative;
@@ -72,13 +66,13 @@ body{
   filter: drop-shadow(0 28px 80px rgba(30,20,40,0.18));
 }
 
-/* top bar stays visible even closed */
+/* TOP BAR (always visible) */
 .folder-top{
   position:absolute;
   left: 18px;
   right: 18px;
   top: 10px;
-  height: 90px;
+  height: 92px;
   z-index: 5;
 
   display:flex;
@@ -88,6 +82,7 @@ body{
 
   padding: 14px 14px;
   border-radius: 26px;
+
   background: rgba(255,255,255,.20);
   border: 1px solid rgba(255,255,255,.35);
   backdrop-filter: blur(10px);
@@ -108,20 +103,20 @@ body{
   height: 10px;
   border-radius: 99px;
   background: linear-gradient(135deg, var(--red), var(--pink));
-  box-shadow: 0 0 0 6px rgba(255,47,151,.12);
+  box-shadow: 0 0 0 7px rgba(255,47,151,.12);
 }
 
 .badge-text{
   font-weight: 900;
-  font-size: 18px;
+  font-size: 20px;
   letter-spacing: -0.2px;
-  color: rgba(20,20,20,.82);
+  color: rgba(20,20,20,.85);
 }
 
 .folder-stamp{
-  width: 74px;
-  height: 74px;
-  border-radius: 22px;
+  width: 84px;
+  height: 84px;
+  border-radius: 24px;
   background: rgba(255,255,255,.22);
   border: 1px solid rgba(255,255,255,.35);
   display:grid;
@@ -130,94 +125,70 @@ body{
 }
 
 .stamp-heart{
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, var(--red), var(--pink));
   transform: rotate(45deg);
-  border-radius: 10px;
+  border-radius: 11px;
   position:relative;
-  box-shadow: 0 16px 30px rgba(255,47,151,.25);
+  box-shadow: 0 18px 34px rgba(255,47,151,.28);
 }
 .stamp-heart::before,
 .stamp-heart::after{
   content:"";
   position:absolute;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: inherit;
 }
-.stamp-heart::before{ left:-17px; top:0; }
-.stamp-heart::after{ top:-17px; left:0; }
+.stamp-heart::before{ left:-20px; top:0; }
+.stamp-heart::after{ top:-20px; left:0; }
 
-/* lid (opens) */
-.folder-lid{
-  position:absolute;
-  left: 14px;
-  right: 14px;
-  top: 0;
-  height: 150px;
-  border-radius: 34px 34px 28px 28px;
-  background: linear-gradient(135deg, #ff1e67, #ff86b7);
-  border: 2px solid rgba(255,255,255,.30);
-  box-shadow: 0 18px 50px rgba(0,0,0,.14);
-
-  transform-origin: top center;
-  transition: transform .75s cubic-bezier(.2,.9,.2,1);
-  z-index: 2;
-}
-
-.lid-shine{
-  position:absolute;
-  inset:0;
-  border-radius: inherit;
-  background: radial-gradient(650px 220px at 22% 12%, rgba(255,255,255,.25), transparent 60%);
-}
-
-/* pocket background */
+/* FOLDER POCKET (NO LID BAR) */
 .folder-pocket{
   position:relative;
-  padding: 120px 18px 18px;
-  border-radius: 40px;
+  padding: 112px 18px 18px; /* room for top bar only */
+  border-radius: 44px;
   background: linear-gradient(135deg, var(--folderA), var(--folderB));
   border: 2px solid rgba(255,255,255,.30);
-  box-shadow: inset 0 -16px 0 rgba(0,0,0,.06), var(--shadow);
+  box-shadow: inset 0 -18px 0 rgba(0,0,0,.06), var(--shadow);
 }
 
-/* inner paper (closed state) */
+/* inner paper */
 .paper{
   width:min(820px, 100%);
   margin: 0 auto;
-  border-radius: 36px;
+  border-radius: 38px;
   padding: 26px 20px 18px;
   background: linear-gradient(180deg, var(--paperA), var(--paperB));
   border: 1px solid rgba(255,255,255,.55);
   box-shadow: var(--shadowSoft);
   text-align:center;
 
+  /* closed state */
   transform-origin: top center;
-  transform: translateY(-16px) rotateX(70deg) scale(.97);
+  transform: translateY(-10px) scale(.98);
   opacity: 0;
   max-height: 0;
   overflow:hidden;
 
   transition:
-    transform .75s cubic-bezier(.2,.9,.2,1),
-    opacity .35s ease,
-    max-height .75s ease;
+    transform .55s cubic-bezier(.2,.9,.2,1),
+    opacity .30s ease,
+    max-height .55s ease;
 }
 
 /* open state */
-.folder.open .folder-lid{ transform: rotateX(-105deg); }
 .folder.open .paper{
-  transform: translateY(0) rotateX(0deg) scale(1);
+  transform: translateY(0) scale(1);
   opacity: 1;
   max-height: 2200px;
 }
 
-/* subtle closed idle wiggle (lightweight) */
+/* subtle idle wiggle when closed */
 .folder:not(.open) .folder-top{
-  animation: nudge 2.8s ease-in-out infinite;
+  animation: nudge 2.6s ease-in-out infinite;
 }
 @keyframes nudge{
   0%,100%{ transform: translateY(0); }
@@ -227,7 +198,7 @@ body{
 .hint{
   margin-top: 12px;
   color: var(--muted);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 /* banner */
@@ -259,7 +230,7 @@ body{
   color: transparent;
 }
 
-/* buttons (NO overlap ever) */
+/* buttons (never overlap heading) */
 .buttons{
   display:flex;
   justify-content:center;
@@ -277,10 +248,11 @@ body{
   font-weight: 900;
   font-size: 19px;
   padding: 18px 56px;
-  min-width: 210px;
+  min-width: 220px;
   max-width: 100%;
   position:relative;
   overflow:hidden;
+  transform-origin: center;
 
   transition:
     transform .22s cubic-bezier(.2,.9,.2,1),
@@ -305,9 +277,10 @@ body{
   color:#fff;
   background: linear-gradient(135deg, var(--pink), var(--pink2));
   box-shadow: 0 22px 46px rgba(255,47,151,.34), inset 0 0 0 1px rgba(255,255,255,.20);
+  transform: scale(var(--yesScale, 1));
 }
-#yes-button:hover{ transform: translateY(-6px) scale(1.04); }
-#yes-button:active{ transform: translateY(-1px) scale(.99); }
+#yes-button:hover{ transform: scale(var(--yesScale, 1)) translateY(-6px); }
+#yes-button:active{ transform: scale(calc(var(--yesScale, 1) * .99)) translateY(-1px); }
 
 #no-button{
   color:#fff;
@@ -316,12 +289,6 @@ body{
 }
 #no-button:hover{ transform: translateY(-6px) scale(1.03); }
 #no-button:active{ transform: translateY(-1px) scale(.99); }
-
-/* yes smooth scaling (JS updates --yesScale) */
-#yes-button{
-  transform: scale(var(--yesScale, 1));
-  transform-origin: center;
-}
 
 /* success message */
 .message{
@@ -344,7 +311,7 @@ body{
   to{ transform: translateY(0) scale(1); opacity:1; }
 }
 
-/* pretty language pill */
+/* language pill toggle */
 .lang{
   margin-top: 18px;
   display:flex;
@@ -354,7 +321,7 @@ body{
   flex-wrap: wrap;
 }
 .lang-label{
-  font-weight: 800;
+  font-weight: 900;
   color: var(--muted);
 }
 
@@ -364,7 +331,7 @@ body{
   align-items:center;
   border-radius: 999px;
   padding: 6px;
-  background: rgba(255,255,255,.65);
+  background: rgba(255,255,255,.66);
   border: 1px solid rgba(255, 208, 226, 0.85);
   box-shadow: 0 12px 24px rgba(0,0,0,0.10);
 }
@@ -394,7 +361,7 @@ body{
   left: 6px;
   width: calc(50% - 6px);
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(255,47,151,.30), rgba(255,139,212,.30));
+  background: linear-gradient(135deg, rgba(255,47,151,.32), rgba(255,139,212,.32));
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
   transition: transform .28s cubic-bezier(.2,.9,.2,1);
 }
@@ -454,12 +421,13 @@ body{
 .p-bow::before{ left:-8px; transform: rotate(-18deg); }
 .p-bow::after{ right:-8px; transform: rotate(18deg); }
 
+/* big yes pulse */
 .pulse{
   position:fixed;
   inset:0;
   z-index: 9999;
   pointer-events:none;
-  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.80), rgba(255,47,151,.16), transparent 65%);
+  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.82), rgba(255,47,151,.18), transparent 65%);
   animation: pulse 1s ease-out forwards;
 }
 @keyframes pulse{
@@ -472,17 +440,20 @@ body{
 @media (max-width: 520px){
   .folder-top{
     left: 12px; right: 12px;
-    height: 86px;
+    height: 88px;
   }
-  .badge-text{ font-size: 16px; }
-  .folder-stamp{ width: 68px; height: 68px; }
-  .stamp-heart{ width: 30px; height: 30px; }
-  .stamp-heart::before,.stamp-heart::after{ width: 30px; height: 30px; }
-  .stamp-heart::before{ left:-15px; }
-  .stamp-heart::after{ top:-15px; }
+  .badge-text{ font-size: 17px; }
+  .folder-stamp{ width: 74px; height: 74px; }
+  .stamp-heart{ width: 34px; height: 34px; }
+  .stamp-heart::before,.stamp-heart::after{ width: 34px; height: 34px; }
+  .stamp-heart::before{ left:-17px; }
+  .stamp-heart::after{ top:-17px; }
 
+  .folder-pocket{ padding: 104px 12px 14px; border-radius: 32px; }
   .banner img{ height: 220px; }
-  #yes-button,#no-button{ width:100%; min-width: unset; }
-  .folder-pocket{ padding: 118px 12px 14px; border-radius: 30px; }
-  .folder-lid{ height: 140px; border-radius: 30px; }
+
+  #yes-button,#no-button{
+    width:100%;
+    min-width: unset;
+  }
 }
