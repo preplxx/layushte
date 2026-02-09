@@ -37,8 +37,11 @@ let yesScale = 1;
 
 // ====== ELEMENTS ======
 const fx = document.getElementById("fx");
+
 const folder = document.getElementById("folder");
+const folderTop = document.getElementById("folder-top");
 const hint = document.getElementById("hint");
+const closeBtn = document.getElementById("close-folder");
 
 const banner = document.getElementById("banner");
 const questionHeading = document.getElementById("question-heading");
@@ -53,105 +56,30 @@ const langPill = document.getElementById("lang-pill");
 const langEn = document.getElementById("lang-en");
 const langAr = document.getElementById("lang-ar");
 
-// sound
+// ====== AUDIO ======
 const bgm = document.getElementById("bgm");
 const aOpen = document.getElementById("sfx-open");
 const aYes = document.getElementById("sfx-yes");
-const aNo = document.getElementById("sfx-no");
+const aNo  = document.getElementById("sfx-no");
+
 const musicToggle = document.getElementById("music-toggle");
-const sfxToggle = document.getElementById("sfx-toggle");
+const sfxToggle   = document.getElementById("sfx-toggle");
 
 let musicOn = false;
 let sfxOn = false;
 
-// Put your files here:
 const AUDIO = {
-  bgm: "./public/sounds/bgm.mp3",
+  bgm:  "./public/sounds/bgm.mp3",
   open: "./public/sounds/open.mp3",
-  yes: "./public/sounds/yes.mp3",
-  no: "./public/sounds/no.mp3"
+  yes:  "./public/sounds/yes.mp3",
+  no:   "./public/sounds/no.mp3"
 };
 
 bgm.src = AUDIO.bgm;
 aOpen.src = AUDIO.open;
 aYes.src = AUDIO.yes;
-aNo.src = AUDIO.no;
+aNo.src  = AUDIO.no;
 
-// ====== OPEN FOLDER ======
-function openFolder(){
-  folder.classList.add("open");
-  if (hint) hint.style.display = "none";
-  playSfx(aOpen);
-}
-
-folder.addEventListener("click", (e) => {
-  if (e.target.closest(".buttons") || e.target.closest(".lang") || e.target.closest(".sound-row")) return;
-  if (!folder.classList.contains("open")) openFolder();
-});
-
-folder.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" || e.key === " ") {
-    e.preventDefault();
-    if (!folder.classList.contains("open")) openFolder();
-  }
-});
-
-// ====== BANNER REFRESH ======
-function refreshBanner(){
-  const src = banner.src;
-  banner.src = "";
-  banner.src = src;
-}
-
-// ====== YES SCALE (smooth, capped) ======
-function applyYesScale(){
-  const cap = window.innerWidth < 520 ? 1.30 : 1.55;
-  yesBtn.style.setProperty("--yesScale", Math.min(yesScale, cap));
-}
-
-// ====== RESET ======
-function resetAll(){
-  // restore main banner
-  banner.src = "./public/images/leaaa.gif";
-  refreshBanner();
-
-  // texts
-  questionHeading.innerHTML = heading_text[language] || heading_text.english;
-  yesBtn.textContent = answers_yes[language] || answers_yes.english;
-  noBtn.textContent = answers_no[language]?.[0] || answers_no.english[0];
-  successMessage.textContent = success_text[language] || success_text.english;
-
-  // state
-  i = 1;
-  clicks = 0;
-  yesScale = 1;
-  applyYesScale();
-
-  // show buttons
-  document.querySelector(".buttons").style.display = "flex";
-  messageWrap.style.display = "none";
-}
-
-restartBtn.addEventListener("click", () => {
-  resetAll();
-  pulse(); // cute feedback
-});
-
-// ====== LANGUAGE ======
-function setLanguage(next){
-  language = next;
-
-  langEn.classList.toggle("is-active", language === "english");
-  langAr.classList.toggle("is-active", language === "arabic");
-  langPill.classList.toggle("is-ar", language === "arabic");
-
-  resetAll();
-}
-
-langEn.addEventListener("click", () => setLanguage("english"));
-langAr.addEventListener("click", () => setLanguage("arabic"));
-
-// ====== SOUNDS ======
 function playSfx(aud){
   if (!sfxOn || !aud) return;
   try{
@@ -170,15 +98,99 @@ async function startMusic(){
   }
 }
 
+// ====== FOLDER OPEN/CLOSE ======
+function openFolder(){
+  folder.classList.add("open");
+  if (hint) hint.style.display = "none";
+  playSfx(aOpen);
+}
+
+function closeFolder(){
+  folder.classList.remove("open");
+  if (hint) hint.style.display = "block";
+  playSfx(aOpen);
+}
+
+// open ONLY by clicking the top bar
+folderTop.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  if (!folder.classList.contains("open")) openFolder();
+});
+
+// keyboard open
+folder.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    if (!folder.classList.contains("open")) openFolder();
+  }
+});
+
+// close by close button only
+closeBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  closeFolder();
+});
+
+// ====== BANNER REFRESH ======
+function refreshBanner(){
+  const src = banner.src;
+  banner.src = "";
+  banner.src = src;
+}
+
+// ====== YES SCALE ======
+function applyYesScale(){
+  const cap = window.innerWidth < 520 ? 1.30 : 1.55;
+  yesBtn.style.setProperty("--yesScale", Math.min(yesScale, cap));
+}
+
+// ====== RESET ======
+function resetAll(){
+  banner.src = "./public/images/leaaa.gif";
+  refreshBanner();
+
+  questionHeading.innerHTML = heading_text[language] || heading_text.english;
+  yesBtn.textContent = answers_yes[language] || answers_yes.english;
+  noBtn.textContent = answers_no[language]?.[0] || answers_no.english[0];
+  successMessage.textContent = success_text[language] || success_text.english;
+
+  i = 1;
+  clicks = 0;
+  yesScale = 1;
+  applyYesScale();
+
+  document.querySelector(".buttons").style.display = "flex";
+  messageWrap.style.display = "none";
+}
+
+restartBtn.addEventListener("click", () => {
+  resetAll();
+  pulse();
+});
+
+// ====== LANGUAGE ======
+function setLanguage(next){
+  language = next;
+
+  langEn.classList.toggle("is-active", language === "english");
+  langAr.classList.toggle("is-active", language === "arabic");
+  langPill.classList.toggle("is-ar", language === "arabic");
+
+  resetAll();
+}
+langEn.addEventListener("click", () => setLanguage("english"));
+langAr.addEventListener("click", () => setLanguage("arabic"));
+
+// ====== SOUND TOGGLES ======
 musicToggle.addEventListener("click", async () => {
   musicOn = !musicOn;
   musicToggle.setAttribute("aria-pressed", musicOn ? "true" : "false");
   musicToggle.textContent = musicOn ? "🎵 Music: On" : "🎵 Music: Off";
-  if (musicOn){
-    await startMusic();
-  } else {
-    try{ bgm.pause(); }catch{}
-  }
+
+  if (musicOn) await startMusic();
+  else { try{ bgm.pause(); }catch{} }
 });
 
 sfxToggle.addEventListener("click", () => {
@@ -188,7 +200,17 @@ sfxToggle.addEventListener("click", () => {
   playSfx(aOpen);
 });
 
-// ====== OPTIMIZED PARTICLES (POOL) ======
+// best-effort autoplay (will still require a click on many browsers)
+window.addEventListener("load", () => {
+  bgm.loop = true;
+  bgm.volume = 0.25;
+  bgm.play().catch(() => {});
+  document.addEventListener("click", () => {
+    bgm.play().catch(() => {});
+  }, { once:true });
+});
+
+// ====== PARTICLES (OPTIMIZED POOL) ======
 function makeEl(cls){
   const el = document.createElement("div");
   el.className = cls;
@@ -205,7 +227,6 @@ function poolCreate(cls, count){
 const heartsPool = poolCreate("p-heart", 70);
 const sparksPool = poolCreate("p-spark", 55);
 const bowsPool   = poolCreate("p-bow", 40);
-
 const active = [];
 
 function spawnFrom(pool, init){
@@ -252,7 +273,7 @@ function tick(){
 }
 requestAnimationFrame(tick);
 
-// ====== AMBIENT EFFECTS ======
+// ambient floaters (lightweight)
 function ambient(){
   const w = window.innerWidth;
   const startX = Math.random() * w;
@@ -289,19 +310,15 @@ function ambient(){
     }));
   }
 }
+setInterval(ambient, 160);
 
-setInterval(ambient, 150);
-setInterval(() => { if (Math.random() < 0.7) ambient(); }, 120);
-
-// ====== MOUSE HEART TRAIL (THROTTLED) ======
+// mouse trail (throttled + only when open)
 let lastTrail = 0;
-
 window.addEventListener("pointermove", (e) => {
   const now = performance.now();
-  if (now - lastTrail < 45) return; // throttle for performance
+  if (now - lastTrail < 55) return;
   lastTrail = now;
 
-  // only when folder is open (optional)
   if (!folder.classList.contains("open")) return;
 
   spawnFrom(heartsPool, (el) => {
@@ -319,10 +336,10 @@ window.addEventListener("pointermove", (e) => {
       vr: -120 + Math.random()*240,
       grav: 520,
       life: 0,
-      maxLife: 1.1 + Math.random()*0.8
+      maxLife: 1.0 + Math.random()*0.7
     };
   });
-}, { passive: true });
+}, { passive:true });
 
 // ====== YES CELEBRATION ======
 function pulse(){
@@ -389,23 +406,25 @@ function yesShow(){
   const cx = window.innerWidth * 0.5;
   const cy = window.innerHeight * 0.55;
 
-  // longer sequence (optimized)
   burst(cx, cy, 1);
   setTimeout(() => burst(cx, cy, 1), 250);
-  setTimeout(() => burst(cx, cy, 1), 600);
-  setTimeout(() => burst(cx, cy, 1), 1000);
-  setTimeout(() => burst(cx, cy, 1), 1500);
-  setTimeout(() => burst(cx, cy, 1), 2100);
-  setTimeout(() => burst(cx, cy, 1), 2800);
-  setTimeout(() => burst(cx, cy, 1), 3600);
+  setTimeout(() => burst(cx, cy, 1), 650);
+  setTimeout(() => burst(cx, cy, 1), 1100);
+  setTimeout(() => burst(cx, cy, 1), 1600);
+  setTimeout(() => burst(cx, cy, 1), 2300);
+  setTimeout(() => burst(cx, cy, 1), 3200);
 }
 
 // ====== BUTTON LOGIC ======
+function setBanner(path){
+  banner.src = path;
+  refreshBanner();
+}
+
 noBtn.addEventListener("click", (e) => {
   e.preventDefault();
 
-  banner.src = "./public/images/yaalimadad.gif";
-  refreshBanner();
+  setBanner("./public/images/yaalimadad.gif");
   playSfx(aNo);
 
   clicks++;
@@ -425,11 +444,10 @@ noBtn.addEventListener("click", (e) => {
 yesBtn.addEventListener("click", (e) => {
   e.preventDefault();
 
-  banner.src = "./public/images/yes.gif";
-  refreshBanner();
+  setBanner("./public/images/yes.gif");
   playSfx(aYes);
 
-  // ensure music can start after user interaction
+  // allow music start after user interaction if enabled
   startMusic();
 
   yesShow();
@@ -445,32 +463,4 @@ yesBtn.addEventListener("click", (e) => {
 setLanguage("english");
 applyYesScale();
 resetAll();
-window.addEventListener("load", () => {
-  const bgm = new Audio("./public/sounds/bgm.mp3");
-  bgm.loop = true;
-  bgm.volume = 0.25;
-
-  // try autoplay
-  bgm.play().catch(() => {
-    console.log("Autoplay blocked. Waiting for user click...");
-  });
-
-  // if autoplay blocked, play on first click
-  document.addEventListener("click", () => {
-    bgm.play().catch(() => {});
-  }, { once: true });
-const closeBtn = document.getElementById("close-folder");
-
-closeBtn.addEventListener("click", (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  folder.classList.remove("open");
-  if (hint) hint.style.display = "block";
-  playSfx(aOpen); // optional whoosh on close
-});
-
-
-
-
-
 
