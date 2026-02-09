@@ -3,36 +3,38 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>layushte</title>
+    <title>Layushte</title>
     <link rel="stylesheet" href="./public/css/style.css" />
   </head>
 
   <body>
-    <!-- FX layer -->
-    <div id="fx"></div>
+    <!-- Effects layer -->
+    <div id="fx" aria-hidden="true"></div>
 
     <main class="stage">
-      <!-- Folder -->
-      <section class="folder" id="folder" role="button" tabindex="0" aria-label="Open message folder">
-        <!-- Top bar ALWAYS visible -->
+      <!-- Folder (click to open) -->
+      <section
+        class="folder"
+        id="folder"
+        role="button"
+        tabindex="0"
+        aria-label="Open the urgent folder"
+      >
+        <!-- Always-visible top bar -->
         <div class="folder-top">
           <div class="folder-badge">
             <span class="badge-dot"></span>
             <span class="badge-text">la layushte super urgent!</span>
           </div>
 
-          <div class="folder-stamp" aria-hidden="true">
+          <div class="folder-stamp">
             <div class="stamp-heart"></div>
           </div>
         </div>
 
-        <!-- Lid -->
-        <div class="folder-lid" aria-hidden="true">
-          <div class="lid-shine"></div>
-        </div>
-
-        <!-- Pocket -->
+        <!-- Folder pocket -->
         <div class="folder-pocket">
+          <!-- Paper (hidden until open) -->
           <div class="paper" id="paper">
             <div class="banner">
               <img id="banner" src="./public/images/leaaa.gif" alt="banner" />
@@ -48,15 +50,18 @@
             </div>
 
             <div class="message" id="message">
-              <h2 id="success-message">YAYYYYY ur such a cutie mo- ahem layush! :3</h2>
+              <h2 id="success-message">
+                YAYYYYY ur such a cutie mo- ahem layush! :3
+              </h2>
             </div>
 
-            <!-- Pretty language pill toggle -->
             <div class="lang">
               <span class="lang-label">Language</span>
-              <div class="lang-pill" role="tablist" aria-label="Language selector">
-                <button class="lang-btn is-active" id="lang-en" type="button" aria-selected="true">English</button>
-                <button class="lang-btn" id="lang-ar" type="button" aria-selected="false">Soore</button>
+              <div class="lang-pill" id="lang-pill">
+                <button class="lang-btn is-active" id="lang-en" type="button">
+                  English
+                </button>
+                <button class="lang-btn" id="lang-ar" type="button">Soore</button>
                 <span class="lang-slider" aria-hidden="true"></span>
               </div>
             </div>
