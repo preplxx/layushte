@@ -445,5 +445,20 @@ yesBtn.addEventListener("click", (e) => {
 setLanguage("english");
 applyYesScale();
 resetAll();
+window.addEventListener("load", () => {
+  const bgm = new Audio("./public/sounds/bgm.mp3");
+  bgm.loop = true;
+  bgm.volume = 0.25;
+
+  // try autoplay
+  bgm.play().catch(() => {
+    console.log("Autoplay blocked. Waiting for user click...");
+  });
+
+  // if autoplay blocked, play on first click
+  document.addEventListener("click", () => {
+    bgm.play().catch(() => {});
+  }, { once: true });
+});
 
 
