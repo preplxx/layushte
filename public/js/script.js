@@ -459,6 +459,23 @@ window.addEventListener("load", () => {
   document.addEventListener("click", () => {
     bgm.play().catch(() => {});
   }, { once: true });
+  let folderOpen = false;
+
+const folder = document.getElementById("folder"); 
+const folderContent = document.getElementById("folder-content");
+
+folder.addEventListener("click", () => {
+  folderOpen = !folderOpen;
+
+  if (folderOpen) {
+    folder.classList.add("open");
+    folderContent.classList.add("show");
+  } else {
+    folder.classList.remove("open");
+    folderContent.classList.remove("show");
+  }
+});
+
 });
 
 
