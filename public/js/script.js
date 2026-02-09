@@ -33,14 +33,11 @@ const success_text = {
 let language = "english";
 let i = 1;
 let clicks = 0;
-
-// smoother growth, capped so it never overlaps heading
 let yesScale = 1;
 
 // ====== ELEMENTS ======
 const fx = document.getElementById("fx");
 const folder = document.getElementById("folder");
-const paper = document.getElementById("paper");
 const hint = document.getElementById("hint");
 
 const banner = document.getElementById("banner");
@@ -51,20 +48,20 @@ const messageWrap = document.getElementById("message");
 const yesBtn = document.getElementById("yes-button");
 const noBtn = document.getElementById("no-button");
 
-const langPill = document.querySelector(".lang-pill");
+const langPill = document.getElementById("lang-pill");
 const langEn = document.getElementById("lang-en");
 const langAr = document.getElementById("lang-ar");
 
-const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+// Force effects ON (so they never "disappear")
+const reducedMotion = false;
 
-// ====== FOLDER OPEN ======
+// ====== OPEN FOLDER ======
 function openFolder(){
   folder.classList.add("open");
   if (hint) hint.style.display = "none";
 }
 
 folder.addEventListener("click", (e) => {
-  // don't toggle when clicking buttons/lang
   if (e.target.closest(".buttons") || e.target.closest(".lang")) return;
   openFolder();
 });
@@ -83,14 +80,13 @@ function refreshBanner(){
   banner.src = src;
 }
 
-// ====== APPLY YES SCALE WITHOUT LAG ======
+// ====== YES SCALE (smooth, capped) ======
 function applyYesScale(){
-  // cap so it can't overlap your heading area
-  const capped = Math.min(yesScale, window.innerWidth < 520 ? 1.35 : 1.55);
-  yesBtn.style.setProperty("--yesScale", capped);
+  const cap = window.innerWidth < 520 ? 1.30 : 1.55;
+  yesBtn.style.setProperty("--yesScale", Math.min(yesScale, cap));
 }
 
-// ====== RESET TEXTS ======
+// ====== RESET UI ======
 function resetTexts(){
   questionHeading.innerHTML = heading_text[language] || heading_text.english;
   yesBtn.textContent = answers_yes[language] || answers_yes.english;
@@ -102,33 +98,25 @@ function resetTexts(){
   yesScale = 1;
   applyYesScale();
 
-  // reset message visibility
   messageWrap.style.display = "none";
   document.querySelector(".buttons").style.display = "flex";
 }
 
-// ====== PRETTY LANGUAGE TOGGLE ======
+// ====== LANGUAGE TOGGLE ======
 function setLanguage(next){
   language = next;
 
   langEn.classList.toggle("is-active", language === "english");
   langAr.classList.toggle("is-active", language === "arabic");
-
-  langEn.setAttribute("aria-selected", language === "english" ? "true" : "false");
-  langAr.setAttribute("aria-selected", language === "arabic" ? "true" : "false");
-
   langPill.classList.toggle("is-ar", language === "arabic");
 
   resetTexts();
 }
 
-langEn.addEventListener("click", (e) => { e.preventDefault(); setLanguage("english"); });
-langAr.addEventListener("click", (e) => { e.preventDefault(); setLanguage("arabic"); });
+langEn.addEventListener("click", () => setLanguage("english"));
+langAr.addEventListener("click", () => setLanguage("arabic"));
 
-// Keep compatibility with your older onchange handler (if any)
-window.changeLanguage = function(){};
-
-// ====== OPTIMIZED PARTICLES (POOLED) ======
+// ====== OPTIMIZED PARTICLES (POOL) ======
 function makeEl(cls){
   const el = document.createElement("div");
   el.className = cls;
@@ -136,16 +124,17 @@ function makeEl(cls){
   fx.appendChild(el);
   return el;
 }
+
 function poolCreate(cls, count){
   const a = [];
   for (let k=0;k<count;k++) a.push(makeEl(cls));
   return a;
 }
 
-// low count = less lag, still cute
-const heartsPool = poolCreate("p-heart", 40);
-const sparksPool = poolCreate("p-spark", 34);
-const bowsPool   = poolCreate("p-bow", 26);
+// more effects (still optimized)
+const heartsPool = poolCreate("p-heart", 70);
+const sparksPool = poolCreate("p-spark", 55);
+const bowsPool   = poolCreate("p-bow", 40);
 
 const active = [];
 
@@ -158,6 +147,7 @@ function spawnFrom(pool, init){
     }
   }
 }
+
 function kill(p){
   p.el.style.display = "none";
   const idx = active.indexOf(p);
@@ -169,8 +159,8 @@ function tick(){
 
   for (let n=active.length-1; n>=0; n--){
     const p = active[n];
-
     p.life += dt;
+
     if (p.life >= p.maxLife){
       kill(p);
       continue;
@@ -182,7 +172,7 @@ function tick(){
     p.rot += p.vr * dt;
 
     const t = p.life / p.maxLife;
-    const a = p.fade ? (1 - t) : 1;
+    const a = 1 - t;
 
     p.el.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${p.rot}deg)`;
     p.el.style.opacity = a.toFixed(3);
@@ -192,49 +182,48 @@ function tick(){
 }
 requestAnimationFrame(tick);
 
-// ambient cute float (hearts + bows + sparkles)
+// ====== AMBIENT EFFECTS (MORE) ======
 function ambient(){
   if (reducedMotion) return;
 
   const w = window.innerWidth;
   const startX = Math.random() * w;
-
   const pick = Math.random();
+
   if (pick < 0.55){
     spawnFrom(heartsPool, (el) => {
-      const size = 10 + Math.random()*10;
+      const size = 10 + Math.random()*12;
       el.style.width = `${size}px`;
       el.style.height = `${size}px`;
-      el.style.background = `rgba(255,47,151,${0.22 + Math.random()*0.22})`;
+      el.style.background = `rgba(255,47,151,${0.20 + Math.random()*0.28})`;
+
       return {
         el,
         x: startX,
-        y: window.innerHeight + 18,
+        y: window.innerHeight + 20,
         vx: -10 + Math.random()*20,
-        vy: -60 - Math.random()*70,
+        vy: -70 - Math.random()*90,
         rot: Math.random()*360,
-        vr: -60 + Math.random()*120,
-        grav: -8,
+        vr: -70 + Math.random()*140,
+        grav: -10,
         life: 0,
-        maxLife: 6 + Math.random()*3,
-        fade: true
+        maxLife: 6 + Math.random()*3
       };
     });
-  } else if (pick < 0.80){
+  } else if (pick < 0.82){
     spawnFrom(bowsPool, (el) => {
-      el.style.background = `rgba(255,47,151,${0.18 + Math.random()*0.18})`;
+      el.style.background = `rgba(255,47,151,${0.16 + Math.random()*0.22})`;
       return {
         el,
         x: startX,
-        y: window.innerHeight + 18,
-        vx: -12 + Math.random()*24,
-        vy: -55 - Math.random()*55,
+        y: window.innerHeight + 20,
+        vx: -14 + Math.random()*28,
+        vy: -60 - Math.random()*70,
         rot: -20 + Math.random()*40,
-        vr: -30 + Math.random()*60,
-        grav: -6,
+        vr: -35 + Math.random()*70,
+        grav: -8,
         life: 0,
-        maxLife: 5 + Math.random()*2.5,
-        fade: true
+        maxLife: 5 + Math.random()*3
       };
     });
   } else {
@@ -242,26 +231,24 @@ function ambient(){
       return {
         el,
         x: startX,
-        y: window.innerHeight + 18,
+        y: window.innerHeight + 20,
         vx: -8 + Math.random()*16,
-        vy: -70 - Math.random()*80,
+        vy: -95 - Math.random()*110,
         rot: 0,
         vr: 0,
-        grav: -10,
+        grav: -12,
         life: 0,
-        maxLife: 3.6 + Math.random()*2.0,
-        fade: true
+        maxLife: 4 + Math.random()*2.5
       };
     });
   }
 }
 
-if (!reducedMotion){
-  // slower spawn = less lag
-  setInterval(ambient, 320);
-}
+// MORE ambient, but still smooth
+setInterval(ambient, 140);
+setInterval(() => { if (Math.random() < 0.7) ambient(); }, 110);
 
-// ====== YES BIG SHOW (longer but optimized) ======
+// ====== YES CELEBRATION ======
 function pulse(){
   const p = document.createElement("div");
   p.className = "pulse";
@@ -269,70 +256,63 @@ function pulse(){
   setTimeout(() => p.remove(), 1100);
 }
 
-function burstWave(){
-  if (reducedMotion) return;
-
-  // modest wave count (smooth)
-  for (let k=0;k<14;k++){
+function burst(centerX, centerY, power=1){
+  // hearts
+  for (let k=0;k<18*power;k++){
     spawnFrom(heartsPool, (el) => {
-      const size = 12 + Math.random()*14;
+      const size = 12 + Math.random()*16;
       el.style.width = `${size}px`;
       el.style.height = `${size}px`;
       el.style.background = `rgba(255,47,151,${0.35 + Math.random()*0.35})`;
 
-      const x = window.innerWidth*0.5 + (-140 + Math.random()*280);
-      const y = window.innerHeight*0.55 + (-60 + Math.random()*120);
-
       return {
         el,
-        x,y,
-        vx: -120 + Math.random()*240,
-        vy: -240 - Math.random()*220,
+        x: centerX + (-120 + Math.random()*240),
+        y: centerY + (-60 + Math.random()*120),
+        vx: (-160 + Math.random()*320) * 0.9,
+        vy: (-260 - Math.random()*260) * 0.9,
         rot: Math.random()*360,
-        vr: -120 + Math.random()*240,
-        grav: 520,
+        vr: -140 + Math.random()*280,
+        grav: 720,
         life: 0,
-        maxLife: 1.8 + Math.random()*0.9,
-        fade: true
+        maxLife: 1.9 + Math.random()*1.0
       };
     });
   }
 
-  for (let k=0;k<10;k++){
+  // sparkles
+  for (let k=0;k<14*power;k++){
     spawnFrom(sparksPool, (el) => {
-      const x = window.innerWidth*0.5 + (-180 + Math.random()*360);
-      const y = window.innerHeight*0.55 + (-60 + Math.random()*120);
       return {
         el,
-        x,y,
-        vx: -160 + Math.random()*320,
-        vy: -220 - Math.random()*220,
+        x: centerX + (-170 + Math.random()*340),
+        y: centerY + (-80 + Math.random()*160),
+        vx: (-210 + Math.random()*420) * 0.85,
+        vy: (-240 - Math.random()*260) * 0.85,
         rot: 0,
         vr: 0,
-        grav: 680,
+        grav: 840,
         life: 0,
-        maxLife: 1.1 + Math.random()*0.7,
-        fade: true
+        maxLife: 1.1 + Math.random()*0.9
       };
     });
   }
 
-  for (let k=0;k<8;k++){
+  // bows
+  for (let k=0;k<10*power;k++){
     spawnFrom(bowsPool, (el) => {
-      el.style.background = `rgba(255,47,151,${0.22 + Math.random()*0.20})`;
-      const x = window.innerWidth*0.5 + (-160 + Math.random()*320);
-      const y = window.innerHeight*0.55 + (-60 + Math.random()*120);
+      el.style.background = `rgba(255,47,151,${0.22 + Math.random()*0.22})`;
       return {
         el,
-        x,y,
-        vx: -110 + Math.random()*220,
-        vy: -200 - Math.random()*180,
+        x: centerX + (-160 + Math.random()*320),
+        y: centerY + (-80 + Math.random()*160),
+        vx: (-170 + Math.random()*340) * 0.75,
+        vy: (-220 - Math.random()*220) * 0.75,
         rot: -20 + Math.random()*40,
-        vr: -80 + Math.random()*160,
-        grav: 520,
+        vr: -90 + Math.random()*180,
+        grav: 680,
         life: 0,
-        maxLife: 2.0 + Math.random()*0.8,
-        fade: true
+        maxLife: 2.1 + Math.random()*1.0
       };
     });
   }
@@ -340,13 +320,19 @@ function burstWave(){
 
 function yesShow(){
   pulse();
-  burstWave();
 
-  if (reducedMotion) return;
+  const cx = window.innerWidth * 0.5;
+  const cy = window.innerHeight * 0.55;
 
-  // longer “overload” without lag
-  const times = [180, 420, 700, 1050, 1450, 1900, 2400, 3000];
-  times.forEach(t => setTimeout(burstWave, t));
+  // longer sequence
+  burst(cx, cy, 1);
+  setTimeout(() => burst(cx, cy, 1), 220);
+  setTimeout(() => burst(cx, cy, 1), 520);
+  setTimeout(() => burst(cx, cy, 1), 900);
+  setTimeout(() => burst(cx, cy, 1), 1400);
+  setTimeout(() => burst(cx, cy, 1), 2000);
+  setTimeout(() => burst(cx, cy, 1), 2700);
+  setTimeout(() => burst(cx, cy, 1), 3500);
 }
 
 // ====== BUTTON LOGIC ======
@@ -358,9 +344,8 @@ noBtn.addEventListener("click", (e) => {
 
   clicks++;
 
-  // smooth scale up (no weird animation)
-  const bump = 0.06 + Math.random()*0.05;
-  yesScale = Math.min(yesScale + bump, 1.8);
+  // smooth scale up, no lag
+  yesScale += 0.08;
   applyYesScale();
 
   const total = answers_no[language].length;
@@ -391,3 +376,4 @@ yesBtn.addEventListener("click", (e) => {
 // init
 setLanguage("english");
 applyYesScale();
+
