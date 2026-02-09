@@ -1,136 +1,222 @@
-body {
-  background-color: white;
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
+/* Optional: nicer font (works even if it fails to load) */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+:root{
+  --bg1:#fff0f6;
+  --bg2:#f7fbff;
+  --card:#ffffffcc;
+  --border:#ffd0e2;
+  --text:#2b2b2b;
+  --muted:#6b6b6b;
+
+  --pink:#ff5aa5;
+  --pink2:#ff84bf;
+  --red:#ff3b3b;
+  --green:#18a957;
+
+  --shadow: 0 18px 45px rgba(30, 20, 40, 0.12);
+  --shadow2: 0 10px 22px rgba(30, 20, 40, 0.12);
 }
 
-/* Container */
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+*{ box-sizing:border-box; }
 
-  margin-top: 20px;
-  padding: 20px;
-  text-align: center;
+body{
+  min-height:100vh;
+  margin:0;
+  padding: 28px 16px;
+  font-family: Poppins, Arial, sans-serif;
+  color: var(--text);
+
+  /* soft valentine background */
+  background:
+    radial-gradient(900px 500px at 20% 10%, #ffd6e9 0%, transparent 55%),
+    radial-gradient(900px 500px at 80% 0%, #d9f2ff 0%, transparent 55%),
+    linear-gradient(135deg, var(--bg1), var(--bg2));
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-/* Banner */
-.banner-gif {
-  width: 100%;
-  height: auto;
-  margin-top: 20px;
+/* cute floating heart-ish glow (no images needed) */
+body::before{
+  content:"";
+  position:fixed;
+  inset:-200px;
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255,90,165,.25) 0%, transparent 45%),
+    radial-gradient(circle at 70% 55%, rgba(255,180,210,.22) 0%, transparent 45%),
+    radial-gradient(circle at 55% 80%, rgba(180,230,255,.18) 0%, transparent 50%);
+  filter: blur(2px);
+  pointer-events:none;
+  z-index:0;
 }
 
-.banner-gif img {
+.container{
+  position:relative;
+  z-index:1;
+
+  width:min(720px, 100%);
+  padding: 26px 22px 22px;
+  text-align:center;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+/* Banner frame */
+.banner-gif{
+  margin-top: 8px;
+  margin-bottom: 14px;
+}
+
+.banner-gif img{
+  height: 260px;
   width: auto;
-  height: 250px;
+  max-width: min(420px, 92vw);
+
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow2);
+  display:block;
+  margin: 0 auto;
 }
 
-/* Buttons container */
-.buttons {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  flex-direction: row;
-  align-items: flex-end;
+/* Title */
+#question-heading{
+  margin: 10px 0 10px;
+  font-size: clamp(26px, 3.2vw, 38px);
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  font-weight: 700;
+}
+
+/* Buttons row */
+.buttons{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap: 12px;
+  margin-top: 14px;
   flex-wrap: wrap;
 }
 
-/* NO button */
-#no-button {
-  margin: 0 10px;
-  color: white;
-  background-color: red;
-  height: 40px !important;
-  width: auto;
-  border: none;
-  cursor: pointer;
-  margin-top: 10px;
-  padding: 10px 20px;
+/* shared button style */
+#yes-button, #no-button{
+  appearance:none;
+  border:none;
+  cursor:pointer;
+
+  padding: 12px 22px;
+  border-radius: 999px;
+
   font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+
+  transition: transform .12s ease, box-shadow .18s ease, filter .18s ease;
+  box-shadow: 0 10px 18px rgba(0,0,0,0.12);
+  user-select:none;
 }
 
-/* YES button */
-#yes-button {
-  margin: 0 10px;
-  color: white;
-  border: none;
-  background-color: green;
-  cursor: pointer;
-  height: 40px;
-  width: auto;
-  margin-top: 10px;
-  padding: 10px 20px;
-  font-size: 16px;
+/* Yes button = pink valentine vibe (instead of harsh green) */
+#yes-button{
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--pink), var(--pink2));
+  box-shadow: 0 14px 26px rgba(255, 90, 165, 0.35);
+}
+
+/* No button = soft red */
+#no-button{
+  color:#ffffff;
+  background: linear-gradient(135deg, #ff4b4b, #ff7a7a);
+  box-shadow: 0 14px 26px rgba(255, 75, 75, 0.28);
+}
+
+/* hover/press */
+#yes-button:hover, #no-button:hover{
+  transform: translateY(-2px);
+  filter: brightness(1.02);
+}
+
+#yes-button:active, #no-button:active{
+  transform: translateY(0px) scale(0.98);
 }
 
 /* Message */
-.message {
-  display: none;
-  margin-top: 20px;
-  font-size: 22px;
+.message{
+  display:none;
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 208, 226, 0.9);
+  background: rgba(255,255,255,0.7);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+}
+
+#success-message{
+  margin: 0;
+  font-size: clamp(18px, 2.1vw, 24px);
+  font-weight: 700;
 }
 
 /* Language selector */
-.language-selector {
-  margin-top: 30px;
-  font-family: Arial, sans-serif;
-
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-
-  width: 100%;
+.language-selector{
+  margin-top: 18px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap: 10px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-weight: 600;
 }
 
-.language-selector label {
-  margin-right: 10px;
+.language-selector label{
+  margin:0;
 }
 
-.language-selector select {
-  padding: 5px;
-  border: 1px solid #ccc;
-  font-size: 16px;
+.language-selector select{
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 208, 226, 0.95);
+  background: rgba(255,255,255,0.75);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.08);
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
 }
 
-/* Creator link */
-.creator {
-  text-decoration: none;
-  color: #333;
+.language-selector select:focus{
+  box-shadow: 0 0 0 4px rgba(255, 90, 165, 0.18), 0 10px 18px rgba(0,0,0,0.08);
 }
 
-.creator:visited {
-  text-decoration: none;
-  color: #333;
+/* Creator link (if you have it) */
+.creator{
+  text-decoration:none;
+  color: #444;
+  opacity: 0.85;
 }
-
-.creator:hover {
+.creator:hover{
+  opacity: 1;
   text-decoration: underline;
-  color: #555;
 }
 
-/* Mobile responsive */
-@media (max-width: 768px) {
-  body {
-    padding: 0 20px;
+/* Mobile tweaks */
+@media (max-width: 520px){
+  .container{
+    padding: 22px 16px 18px;
+    border-radius: 22px;
   }
-
-  .banner-gif img {
-    height: 200px;
+  .banner-gif img{
+    height: 210px;
+    border-radius: 18px;
   }
-
-  #yes-button,
-  #no-button {
-    font-size: 14px;
-    padding: 10px 15px;
+  #yes-button, #no-button{
+    width: 100%;
+    max-width: 280px;
   }
 }
+
